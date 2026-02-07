@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Tech Stack
 
 - **Language:** PHP
-- **Framework:** [Flight PHP](https://flightphp.com/) v3 — a lightweight micro framework
+- **Framework:** [Flight PHP](https://flightphp.com/) v3 — a lightweight micro framework ([v3 docs](https://docs.flightphp.com/en/v3/learn))
 - **Dependency management:** Composer
 
 ## Common Commands
