@@ -35,6 +35,18 @@ Flight PHP is a micro framework with route-based architecture. Key conventions:
 - The framework entry point is typically a single `index.php` that bootstraps routes and middleware
 - Flight uses `Flight::json()` for JSON responses (this is a REST API backend)
 
+## Development Principles
+
+- **Test-Driven Development (TDD)**: write a failing test first, make it pass, then refactor. Every feature or bug fix starts with a test.
+- **SOLID principles**:
+  - **S**ingle Responsibility — each class does one thing
+  - **O**pen/Closed — extend behavior without modifying existing code
+  - **L**iskov Substitution — subtypes must be substitutable for their base types
+  - **I**nterface Segregation — prefer small, focused interfaces over large ones
+  - **D**ependency Inversion — depend on abstractions, not concretions; inject dependencies
+- Keep classes small and methods short. Favor composition over inheritance.
+- Name things clearly — code should read like prose, not puzzles.
+
 ## Domain Concepts
 
 - **Community**: a group of people (e.g. a family) sharing expenses
