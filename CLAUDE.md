@@ -56,6 +56,15 @@ Flight PHP is a micro framework with route-based architecture. Key conventions:
 - **Contribution percentage**: the share of income a member puts into the common account — scales progressively based on income relative to the median
 - **Common account**: the shared bank account funded by contributions, used for community expenses
 
+## Database
+
+- **Engine:** SQLite
+- **DB file:** `database/cash.db` (git-ignored)
+- **Schema:** `database/schema.sql` — contains DDL, indexes, triggers, and seed data
+- **Initialize:** `php database/init_db.php` — creates the DB from the schema. Refuses to run if the DB file already exists; delete it first to reinitialize.
+- **Tables:** `community`, `member`, `income`, `expense`
+- **Seed data:** one community ("Famiglia"), two members (admin/85%, test/75%)
+
 ## Learnings & Suggestions
 
 When you notice a meaningful pattern, a recurring mistake, or a useful tip for this project, update `.claude/tips.md`. Do this only when genuinely relevant — not on every prompt. Examples of when to write:
