@@ -55,3 +55,11 @@ Flight PHP is a micro framework with route-based architecture. Key conventions:
 - **Median income**: the statistical median of all members' incomes, used as the reference point for contribution rates
 - **Contribution percentage**: the share of income a member puts into the common account — scales progressively based on income relative to the median
 - **Common account**: the shared bank account funded by contributions, used for community expenses
+
+## Learnings & Suggestions
+
+When you notice a meaningful pattern, a recurring mistake, or a useful tip for this project, update `.claude/tips.md`. Do this only when genuinely relevant — not on every prompt. Examples of when to write:
+
+- A debugging approach that worked (or didn't) for this codebase
+- A project-specific convention discovered while reading existing code
+- A constraint or gotcha worth remembering for future sessions
