@@ -1,0 +1,22 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use App\Command\CommunityCommand;
+
+// Parse arguments
+$args = ['action' => $argv[1] ?? null];
+for ($i = 2; $i < count($argv); $i++) {
+    if (preg_match('/^--([^=]+)=(.*)$/', $argv[$i], $matches)) {
+        $args[$matches[1]] = $matches[2];
+    }
+}
+
+// Initialize database
+$pdo = new PDO('sqlite:' . __DIR__ . '/../database/cash.db');
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Execute command
+$command = new CommunityCommand($pdo, $args);
+exit($command->execute());
