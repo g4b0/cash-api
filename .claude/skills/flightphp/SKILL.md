@@ -1,3 +1,9 @@
+---
+name: flightphp
+description: Load Flight PHP v3 conventions for testing, routing, and entry point setup
+user-invocable: true
+---
+
 # Flight PHP v3 Conventions
 
 ## Testing

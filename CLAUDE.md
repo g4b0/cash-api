@@ -12,19 +12,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Framework:** [Flight PHP](https://flightphp.com/) v3 — a lightweight micro framework ([v3 docs](https://docs.flightphp.com/en/v3/learn))
 - **Dependency management:** Composer
 
+## PHP Environment
+
+- Always use `php7.4` as the PHP executable when running Composer or any PHP CLI command.
+- Example: `php7.4 /usr/local/bin/composer install` instead of `composer install`.
+
 ## Common Commands
 
 ```bash
 # Install dependencies
-composer install
+php7.4 /usr/local/bin/composer install
 
 # Start PHP built-in dev server (typical Flight setup)
-php -S localhost:8000
+php7.4 -S localhost:8000
 
 # Run tests (once configured)
-composer test
+php7.4 /usr/local/bin/composer test
 # or
-./vendor/bin/phpunit
+php7.4 ./vendor/bin/phpunit
 ```
 
 ## Architecture
@@ -72,3 +77,5 @@ When you notice a meaningful pattern, a recurring mistake, or a useful tip for t
 - A debugging approach that worked (or didn't) for this codebase
 - A project-specific convention discovered while reading existing code
 - A constraint or gotcha worth remembering for future sessions
+
+When you discover something useful about the Flight PHP framework — a gotcha, a workaround, an undocumented behavior, or a best practice — update the `/flightphp` skill (`.claude/skills/flightphp/SKILL.md`) so the knowledge is available in future sessions.

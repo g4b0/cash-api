@@ -1,3 +1,9 @@
+---
+name: business-logic
+description: Load the core domain rules (auth, data models, balance calculation, validation, API behavior)
+user-invocable: true
+---
+
 # Business Logic Rules
 
 Core domain rules for the Cash application. All features and tests must conform to these rules.
