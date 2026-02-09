@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Exception\AppException;
 use App\Service\JwtService;
 use flight\Engine;
 use PDO;
@@ -21,13 +22,11 @@ class AuthController
         $password = $this->app->request()->data->password;
 
         if (empty($username)) {
-            $this->app->json(['error' => 'Username is required'], 400);
-            return;
+            throw AppException::USERNAME_REQUIRED();
         }
 
         if (empty($password)) {
-            $this->app->json(['error' => 'Password is required'], 400);
-            return;
+            throw AppException::PASSWORD_REQUIRED();
         }
 
         $db = $this->app->get('db');
@@ -36,8 +35,7 @@ class AuthController
         $member = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$member || !password_verify($password, $member['password'])) {
-            $this->app->json(['error' => 'Invalid credentials'], 401);
-            return;
+            throw AppException::INVALID_CREDENTIALS();
         }
 
         $jwtService = new JwtService($this->app->get('jwt_secret'));
@@ -53,8 +51,7 @@ class AuthController
         $refreshToken = $this->app->request()->data->refresh_token;
 
         if (empty($refreshToken)) {
-            $this->app->json(['error' => 'Refresh token is required'], 400);
-            return;
+            throw AppException::REFRESH_TOKEN_REQUIRED();
         }
 
         $jwtService = new JwtService($this->app->get('jwt_secret'));
@@ -63,16 +60,17 @@ class AuthController
             $decoded = $jwtService->decode($refreshToken);
 
             if (($decoded->type ?? '') !== 'refresh') {
-                $this->app->json(['error' => 'Invalid token type'], 401);
-                return;
+                throw AppException::INVALID_TOKEN_TYPE();
             }
 
             $this->app->json([
                 'access_token' => $jwtService->generateAccessToken((int) $decoded->sub, (int) $decoded->cid),
                 'refresh_token' => $jwtService->generateRefreshToken((int) $decoded->sub, (int) $decoded->cid),
             ]);
+        } catch (AppException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            $this->app->json(['error' => 'Invalid or expired refresh token'], 401);
+            throw AppException::INVALID_OR_EXPIRED_TOKEN();
         }
     }
 }

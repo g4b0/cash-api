@@ -2,6 +2,7 @@
 
 namespace App\Middleware;
 
+use App\Exception\AppException;
 use App\Service\JwtService;
 use flight\Engine;
 
@@ -14,33 +15,35 @@ class JwtAuthMiddleware
         $publicRoutes = self::PUBLIC_ROUTES;
 
         $app->map('start', function () use ($app, $publicRoutes) {
-            $url = $app->request()->url;
+            try {
+                $url = $app->request()->url;
 
-            if (!in_array($url, $publicRoutes, true)) {
-                $authHeader = $app->request()->getHeader('Authorization');
-                if (empty($authHeader) || !preg_match('/^Bearer\s+(.+)$/', $authHeader, $matches)) {
-                    $app->json(['error' => 'Unauthorized'], 401);
-                    return;
-                }
-
-                try {
-                    $jwtService = new JwtService($app->get('jwt_secret'));
-                    $decoded = $jwtService->decode($matches[1]);
-
-                    if (($decoded->type ?? '') !== 'access') {
-                        $app->json(['error' => 'Unauthorized'], 401);
-                        $app->error();
-                        return;
+                if (!in_array($url, $publicRoutes, true)) {
+                    $authHeader = $app->request()->getHeader('Authorization');
+                    if (empty($authHeader) || !preg_match('/^Bearer\s+(.+)$/', $authHeader, $matches)) {
+                        throw AppException::UNAUTHORIZED();
                     }
 
-                    $app->set('auth_user', $decoded);
-                } catch (\Exception $e) {
-                    $app->json(['error' => 'Unauthorized'], 401);
-                    return;
-                }
-            }
+                    try {
+                        $jwtService = new JwtService($app->get('jwt_secret'));
+                        $decoded = $jwtService->decode($matches[1]);
 
-            $app->_start();
+                        if (($decoded->type ?? '') !== 'access') {
+                            throw AppException::UNAUTHORIZED();
+                        }
+
+                        $app->set('auth_user', $decoded);
+                    } catch (AppException $e) {
+                        throw $e;
+                    } catch (\Exception $e) {
+                        throw AppException::UNAUTHORIZED();
+                    }
+                }
+
+                $app->_start();
+            } catch (\Throwable $e) {
+                $app->handleException($e);
+            }
         });
     }
 }
