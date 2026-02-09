@@ -19,9 +19,16 @@ user-invocable: true
 - Route params use `@` prefix: `$app->route('GET /@community_id/@member_id', $callback)`.
 - JSON responses: `$app->json($data, $statusCode)`.
 
+## Controllers
+
+- Flight auto-injects `Engine` into controllers: `new ControllerClass($engine)` (see `Dispatcher.php:384-385`).
+- Route syntax: `$app->route('GET /path', [Controller::class, 'method'])`.
+- Access services/DB via `$this->app->get('key')` where `$this->app` is the injected `Engine`.
+- No DI container needed — store shared objects with `$app->set('key', $value)`.
+
 ## Entry Point
 
-- `index.php`: require autoload, create or get app, register routes, call `$app->start()`.
+- `index.php`: require autoload, create or get app, set up shared services (`$app->set('db', $pdo)`), register routes, call `$app->start()`.
 
 ## Docs
 

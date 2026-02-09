@@ -2,7 +2,9 @@
     "require": {
         "php": ">=7.4",
         "flightphp/core": "^3.18",
-        "ext-sqlite3": "*"
+        "ext-sqlite3": "*",
+        "ext-pdo": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6"

@@ -1,10 +1,9 @@
 <?php
 
+use App\Controller\DashboardController;
 use flight\Engine;
 
 function registerRoutes(Engine $app): void
 {
-    $app->route('GET /@community_id/@member_id', function (string $community_id, string $member_id) use ($app) {
-        $app->json([]);
-    });
+    $app->route('GET /@community_id/@member_id', [DashboardController::class, 'show']);
 }

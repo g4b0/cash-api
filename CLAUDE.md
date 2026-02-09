@@ -68,7 +68,7 @@ Flight PHP is a micro framework with route-based architecture. Key conventions:
 - **Schema:** `database/schema.sql` — contains DDL, indexes, triggers, and seed data
 - **Initialize:** `php database/init_db.php` — creates the DB from the schema. Refuses to run if the DB file already exists; delete it first to reinitialize.
 - **Tables:** `community`, `member`, `income`, `expense`
-- **Seed data:** one community ("Famiglia"), two members (admin/85%, test/75%)
+- **Seed data:** one community ("Family"), two members (first/85%, second/75%)
 
 ## Learnings & Suggestions
 

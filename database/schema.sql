@@ -84,10 +84,3 @@ CREATE TRIGGER update_expense_timestamp
 BEGIN
     UPDATE expense SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
 END;
-
--- Seed data
-INSERT INTO community (name) VALUES ('Famiglia');
-
-INSERT INTO member (community_id, name, username, password, contribution_percentage)
-VALUES (1, 'Admin User', 'admin', '$2y$12$25CRWehyQXxiB3s144NwaekXfO4Or8TjLMqGcwjzCmYGhtIeMgsEq', 85),
-       (1, 'Test User', 'test', '$2y$12$K7d4wjiOJMWLekf2s43X8.A.yeIuiVTgMTpCXEDfc7fuD4eA/wU.a', 75);
