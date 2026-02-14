@@ -53,6 +53,13 @@ Flight PHP is a micro framework with route-based architecture. Key conventions:
 - Name things clearly — code should read like prose, not puzzles.
 - Prefer to throw exceptions instead of returning after printing a JSON.
 
+## Documentation
+
+Keep documentation updated.
+- **Routes**: when adding or modifying a route behavior update README.md and openapi.yaml
+- **Commands**: when adding or modifying a command behavior update README.md 
+- **Project structure**: when adding or modifying project structure behavior update README.md
+
 # Domain Concepts
 
 - **Community**: a group of people (e.g. a family) sharing expenses
