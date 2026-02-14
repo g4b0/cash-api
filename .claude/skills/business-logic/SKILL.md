@@ -13,8 +13,11 @@ Core domain rules for the Cash application. All features and tests must conform 
 - **JWT-based** login and logout.
 - **All endpoints require authentication** — unauthenticated requests must be rejected.
 - **Write access is self-only**: users can only create or modify their own Income/Expense records. The owner is always the authenticated user.
-- **Read access is open within the community**: any authenticated user can view any member's dashboard (transaction history + balance). This is read-only.
-- If a requested member does not exist, respond with **403 Forbidden**.
+- **Read access is community-restricted**:
+  - Users can view balance for any member **within their own community** (read-only).
+  - Users **cannot** view balance for members in different communities (403 Forbidden).
+  - Income/Expense records follow the same pattern: view within community, modify own only.
+- **Member existence**: If a requested member does not exist, respond with **404 Not Found**.
 
 ## Data Models
 
@@ -91,4 +94,4 @@ for each Expense record:
 ## API Behavior
 
 - **Recording income or expense**: a database write followed by an acknowledgement response. No side effects, no recalculations triggered.
-- **Dashboard**: reads the member's transaction history, computes the credit/debit balance, and returns both.
+- **Dashboard** (`GET /balance/@community_id/@member_id`): reads the member's balance (computed at runtime). Authorization: user must be in the same community as the requested member.

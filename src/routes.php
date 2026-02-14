@@ -28,5 +28,6 @@ function registerRoutes(Engine $app): void
     $app->route('PATCH /expense/@id', [ExpenseController::class, 'update']);
     $app->route('DELETE /expense/@id', [ExpenseController::class, 'delete']);
 
-    $app->route('GET /@community_id/@member_id', [DashboardController::class, 'show']);
+    // Dashboard/Balance
+    $app->route('GET /balance/@community_id/@member_id', [DashboardController::class, 'balance']);
 }

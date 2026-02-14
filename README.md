@@ -86,15 +86,17 @@ Response:
 
 ### Dashboard (Authenticated)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/{community_id}/{member_id}` | Get member's balance and transaction history |
+| Method | Endpoint | Description | Authorization |
+|--------|----------|-------------|---------------|
+| GET | `/balance/{community_id}/{member_id}` | Get member's balance | Same community |
 
-**Example: Get Dashboard**
+**Example: Get Balance**
 ```bash
-curl http://localhost:8000/1/1 \
+curl http://localhost:8000/balance/1/1 \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..."
 ```
+
+**Authorization**: User must belong to the same community as the requested member.
 
 **Balance calculation**: `SUM(income × contribution_percentage ÷ 100) - SUM(expenses)`
 

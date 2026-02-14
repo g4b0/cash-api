@@ -37,12 +37,12 @@ class DashboardRouteTest extends TestCase
         $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $token;
     }
 
-    public function testDashboardWithoutTokenReturns401(): void
+    public function testBalanceWithoutTokenReturns401(): void
     {
         $communityId = DatabaseSeeder::seedCommunity($this->db, 'Famiglia');
         $memberId = DatabaseSeeder::seedMember($this->db, $communityId, 'Test User', 'test', 75);
 
-        $this->app->request()->url = "/$communityId/$memberId";
+        $this->app->request()->url = "/balance/$communityId/$memberId";
         $this->app->request()->method = 'GET';
 
         $this->app->start();
@@ -53,14 +53,14 @@ class DashboardRouteTest extends TestCase
         $this->assertArrayHasKey('error', $body);
     }
 
-    public function testDashboardWithInvalidTokenReturns401(): void
+    public function testBalanceWithInvalidTokenReturns401(): void
     {
         $communityId = DatabaseSeeder::seedCommunity($this->db, 'Famiglia');
         $memberId = DatabaseSeeder::seedMember($this->db, $communityId, 'Test User', 'test', 75);
 
         $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer invalid-token';
 
-        $this->app->request()->url = "/$communityId/$memberId";
+        $this->app->request()->url = "/balance/$communityId/$memberId";
         $this->app->request()->method = 'GET';
 
         $this->app->start();
@@ -71,14 +71,14 @@ class DashboardRouteTest extends TestCase
         $this->assertArrayHasKey('error', $body);
     }
 
-    public function testDashboardReturnsZeroBalanceForMemberWithNoRecords(): void
+    public function testBalanceReturnsZeroBalanceForMemberWithNoRecords(): void
     {
         $communityId = DatabaseSeeder::seedCommunity($this->db, 'Famiglia');
         $memberId = DatabaseSeeder::seedMember($this->db, $communityId, 'Test User', 'test', 75);
 
         $this->authenticateAs($memberId, $communityId);
 
-        $this->app->request()->url = "/$communityId/$memberId";
+        $this->app->request()->url = "/balance/$communityId/$memberId";
         $this->app->request()->method = 'GET';
 
         $this->app->start();
@@ -89,7 +89,7 @@ class DashboardRouteTest extends TestCase
         $this->assertEquals(0, $body['balance']);
     }
 
-    public function testDashboardReturnsCorrectBalance(): void
+    public function testBalanceReturnsCorrectBalance(): void
     {
         $communityId = DatabaseSeeder::seedCommunity($this->db, 'Famiglia');
         $memberId = DatabaseSeeder::seedMember($this->db, $communityId, 'Test User', 'test', 75);
@@ -105,7 +105,7 @@ class DashboardRouteTest extends TestCase
         $this->authenticateAs($memberId, $communityId);
 
         // Balance = contributions - expenses = 1125 - 500 = 625
-        $this->app->request()->url = "/$communityId/$memberId";
+        $this->app->request()->url = "/balance/$communityId/$memberId";
         $this->app->request()->method = 'GET';
 
         $this->app->start();
@@ -114,5 +114,59 @@ class DashboardRouteTest extends TestCase
 
         $body = json_decode($this->app->response()->getBody(), true);
         $this->assertEquals(625, $body['balance']);
+    }
+
+    public function testBalanceForMemberInSameCommunityReturns200(): void
+    {
+        $communityId = DatabaseSeeder::seedCommunity($this->db, 'Famiglia');
+        $member1Id = DatabaseSeeder::seedMember($this->db, $communityId, 'Member 1', 'member1', 75);
+        $member2Id = DatabaseSeeder::seedMember($this->db, $communityId, 'Member 2', 'member2', 80);
+
+        // Authenticate as member1, view member2's balance
+        $this->authenticateAs($member1Id, $communityId);
+
+        $this->app->request()->url = "/balance/$communityId/$member2Id";
+        $this->app->request()->method = 'GET';
+
+        $this->app->start();
+
+        $this->assertEquals(200, $this->app->response()->status());
+
+        $body = json_decode($this->app->response()->getBody(), true);
+        $this->assertArrayHasKey('balance', $body);
+    }
+
+    public function testBalanceForMemberInDifferentCommunityReturns403(): void
+    {
+        $community1Id = DatabaseSeeder::seedCommunity($this->db, 'Community 1');
+        $member1Id = DatabaseSeeder::seedMember($this->db, $community1Id, 'Member 1', 'member1', 75);
+
+        $community2Id = DatabaseSeeder::seedCommunity($this->db, 'Community 2');
+        $member2Id = DatabaseSeeder::seedMember($this->db, $community2Id, 'Member 2', 'member2', 80);
+
+        // Authenticate as member1, try to view member2's balance (different community)
+        $this->authenticateAs($member1Id, $community1Id);
+
+        $this->app->request()->url = "/balance/$community2Id/$member2Id";
+        $this->app->request()->method = 'GET';
+
+        $this->app->start();
+
+        $this->assertEquals(403, $this->app->response()->status());
+    }
+
+    public function testBalanceForNonExistentMemberReturns404(): void
+    {
+        $communityId = DatabaseSeeder::seedCommunity($this->db, 'Famiglia');
+        $memberId = DatabaseSeeder::seedMember($this->db, $communityId, 'Test User', 'test', 75);
+
+        $this->authenticateAs($memberId, $communityId);
+
+        $this->app->request()->url = "/balance/$communityId/99999";
+        $this->app->request()->method = 'GET';
+
+        $this->app->start();
+
+        $this->assertEquals(404, $this->app->response()->status());
     }
 }
