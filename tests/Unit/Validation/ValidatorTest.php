@@ -148,4 +148,88 @@ class ValidatorTest extends TestCase
         $result = $this->validator->validateContributionPercentage(null);
         $this->assertNull($result);
     }
+
+    // validatePerPage tests
+    public function testValidatePerPageWithValidNumbers(): void
+    {
+        $this->assertEquals(1, $this->validator->validatePerPage('1'));
+        $this->assertEquals(25, $this->validator->validatePerPage('25'));
+        $this->assertEquals(50, $this->validator->validatePerPage('50'));
+        $this->assertEquals(100, $this->validator->validatePerPage('100'));
+    }
+
+    public function testValidatePerPageDefaultsTo25(): void
+    {
+        $this->assertEquals(25, $this->validator->validatePerPage(null));
+    }
+
+    public function testValidatePerPageRejectsZero(): void
+    {
+        $this->expectException(AppException::class);
+        $this->expectExceptionMessage('Items per page must be between 1 and 100');
+
+        $this->validator->validatePerPage('0');
+    }
+
+    public function testValidatePerPageRejectsNegative(): void
+    {
+        $this->expectException(AppException::class);
+        $this->expectExceptionMessage('Items per page must be between 1 and 100');
+
+        $this->validator->validatePerPage('-1');
+    }
+
+    public function testValidatePerPageRejectsOver100(): void
+    {
+        $this->expectException(AppException::class);
+        $this->expectExceptionMessage('Items per page must be between 1 and 100');
+
+        $this->validator->validatePerPage('101');
+    }
+
+    public function testValidatePerPageRejectsNonNumeric(): void
+    {
+        $this->expectException(AppException::class);
+        $this->expectExceptionMessage('Items per page must be between 1 and 100');
+
+        $this->validator->validatePerPage('abc');
+    }
+
+    // validatePage tests
+    public function testValidatePageWithValidNumbers(): void
+    {
+        $this->assertEquals(1, $this->validator->validatePage('1'));
+        $this->assertEquals(2, $this->validator->validatePage('2'));
+        $this->assertEquals(100, $this->validator->validatePage('100'));
+        $this->assertEquals(9999, $this->validator->validatePage('9999'));
+    }
+
+    public function testValidatePageDefaultsTo1(): void
+    {
+        $this->assertEquals(1, $this->validator->validatePage(null));
+    }
+
+    public function testValidatePageRejectsZero(): void
+    {
+        $this->expectException(AppException::class);
+        $this->expectExceptionMessage('Page must be greater than zero');
+
+        $this->validator->validatePage('0');
+    }
+
+    public function testValidatePageRejectsNegative(): void
+    {
+        $this->expectException(AppException::class);
+        $this->expectExceptionMessage('Page must be greater than zero');
+
+        $this->validator->validatePage('-1');
+    }
+
+    public function testValidatePageRejectsNonNumeric(): void
+    {
+        $this->expectException(AppException::class);
+        $this->expectExceptionMessage('Page must be greater than zero');
+
+        $this->validator->validatePage('abc');
+    }
 }

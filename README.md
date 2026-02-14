@@ -10,11 +10,12 @@ A backend REST API for managing shared finances in small communities (e.g., fami
 - **Income & Expense Management**: Full CRUD operations for income and expense records
 - **Progressive Contribution**: Contribution percentage scales with income relative to median
 - **Member Dashboard**: View balance (contributions minus expenses)
+- **Transactions List**: Paginated list of merged income/expense transactions, sorted by date
 - **Input Validation**: Centralized validator with comprehensive error handling
 - **REST API**: JSON responses, built with Flight PHP v3
 - **CLI Commands**: Manage communities and members from the terminal
 - **OpenAPI Specification**: Complete API documentation (importable to ApiDog, Postman, etc.)
-- **Full Test Coverage**: TDD approach with PHPUnit (96 tests, 211 assertions)
+- **Full Test Coverage**: TDD approach with PHPUnit (121 tests, 285 assertions)
 
 ## Tech Stack
 
@@ -99,6 +100,67 @@ curl http://localhost:8000/balance/1/1 \
 **Authorization**: User must belong to the same community as the requested member.
 
 **Balance calculation**: `SUM(income × contribution_percentage ÷ 100) - SUM(expenses)`
+
+### Transactions List (Authenticated)
+
+| Method | Endpoint | Description | Authorization |
+|--------|----------|-------------|---------------|
+| GET | `/transactions/{community_id}/{member_id}[/{num}[/{page}]]` | Get paginated list of member's transactions | Same community |
+
+**Example: Get Transactions (Default)**
+```bash
+curl http://localhost:8000/transactions/1/1 \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..."
+```
+
+**Example: Custom Pagination**
+```bash
+# 10 items per page, page 2
+curl http://localhost:8000/transactions/1/1/10/2 \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..."
+```
+
+**Parameters:**
+- `num` (optional): Items per page (1-100), defaults to 25
+- `page` (optional): Page number (≥1), defaults to 1
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "type": "income",
+      "date": "2025-02-14",
+      "reason": "Salary",
+      "amount": "1000.50",
+      "contribution_percentage": 75,
+      "created_at": "2025-02-14 10:00:00",
+      "updated_at": "2025-02-14 10:00:00"
+    },
+    {
+      "id": 2,
+      "type": "expense",
+      "date": "2025-02-13",
+      "reason": "Groceries",
+      "amount": "500.00",
+      "contribution_percentage": null,
+      "created_at": "2025-02-13 15:30:00",
+      "updated_at": "2025-02-13 15:30:00"
+    }
+  ],
+  "pagination": {
+    "current_page": 1,
+    "total_pages": 3,
+    "total_items": 67,
+    "per_page": 25
+  }
+}
+```
+
+**Authorization**: User must belong to the same community as the requested member.
+
+**Sorting**: Transactions are sorted by date descending (newest first).
 
 ### Income Management (Authenticated)
 

@@ -173,6 +173,131 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /transactions/{community_id}/{member_id}:
+    get:
+      tags:
+        - Dashboard
+      summary: Get paginated list of member's transactions
+      description: Returns merged income and expense transactions sorted by date descending. User must belong to the same community as the requested member.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Community ID
+          example: 1
+        - name: member_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Member ID
+          example: 1
+        - name: num
+          in: path
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          description: Items per page (1-100)
+          example: 25
+        - name: page
+          in: path
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number (starts from 1)
+          example: 1
+      responses:
+        '200':
+          description: Transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        type:
+                          type: string
+                          enum: [income, expense]
+                          example: income
+                        date:
+                          type: string
+                          format: date
+                          example: "2025-02-14"
+                        reason:
+                          type: string
+                          example: "Salary"
+                        amount:
+                          type: string
+                          example: "1000.50"
+                        contribution_percentage:
+                          type: integer
+                          nullable: true
+                          description: Only present for income records
+                          example: 75
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2025-02-14 10:00:00"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2025-02-14 10:00:00"
+                  pagination:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      total_pages:
+                        type: integer
+                        example: 3
+                      total_items:
+                        type: integer
+                        example: 67
+                      per_page:
+                        type: integer
+                        example: 25
+        '400':
+          description: Bad Request - invalid num or page parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - user not in same community as requested member
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - member does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /income:
     post:
       tags:

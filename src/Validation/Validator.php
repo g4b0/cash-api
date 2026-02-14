@@ -86,4 +86,56 @@ class Validator
 
         return $value;
     }
+
+    /**
+     * Validate items per page is between 1 and 100. Defaults to 25 if null.
+     *
+     * @param string|null $num
+     * @return int
+     * @throws AppException
+     */
+    public function validatePerPage(?string $num): int
+    {
+        if ($num === null) {
+            return 25;
+        }
+
+        if (!is_numeric($num)) {
+            throw AppException::INVALID_PER_PAGE();
+        }
+
+        $value = (int) $num;
+
+        if ($value < 1 || $value > 100) {
+            throw AppException::INVALID_PER_PAGE();
+        }
+
+        return $value;
+    }
+
+    /**
+     * Validate page number is greater than zero. Defaults to 1 if null.
+     *
+     * @param string|null $page
+     * @return int
+     * @throws AppException
+     */
+    public function validatePage(?string $page): int
+    {
+        if ($page === null) {
+            return 1;
+        }
+
+        if (!is_numeric($page)) {
+            throw AppException::INVALID_PAGE();
+        }
+
+        $value = (int) $page;
+
+        if ($value < 1) {
+            throw AppException::INVALID_PAGE();
+        }
+
+        return $value;
+    }
 }

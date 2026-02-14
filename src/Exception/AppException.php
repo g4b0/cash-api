@@ -22,6 +22,8 @@ use Exception;
  * @method static self EXPENSE_NOT_FOUND()
  * @method static self FORBIDDEN()
  * @method static self MEMBER_NOT_FOUND()
+ * @method static self INVALID_PER_PAGE()
+ * @method static self INVALID_PAGE()
  */
 class AppException extends Exception
 {
@@ -40,6 +42,8 @@ class AppException extends Exception
     public const EXPENSE_NOT_FOUND = 'Expense record not found';
     public const FORBIDDEN = 'You do not have permission to access this resource';
     public const MEMBER_NOT_FOUND = 'Member not found';
+    public const INVALID_PER_PAGE = 'Items per page must be between 1 and 100';
+    public const INVALID_PAGE = 'Page must be greater than zero';
 
     private string $errorKey;
 

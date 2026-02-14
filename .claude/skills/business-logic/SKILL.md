@@ -95,3 +95,4 @@ for each Expense record:
 
 - **Recording income or expense**: a database write followed by an acknowledgement response. No side effects, no recalculations triggered.
 - **Dashboard** (`GET /balance/@community_id/@member_id`): reads the member's balance (computed at runtime). Authorization: user must be in the same community as the requested member.
+- **Transactions list** (`GET /transactions/@community_id/@member_id(/@num(/@page))`): returns paginated list of merged income and expense transactions, sorted by date descending. Pagination: `num` (1-100, default 25), `page` (≥1, default 1). Authorization: user must be in the same community as the requested member.
