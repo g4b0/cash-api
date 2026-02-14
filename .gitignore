@@ -1,5 +1,6 @@
 /vendor/
 .idea/
 .claude/shared/
+.claude/commands/
 database/cash.db
 /.phpunit.result.cache

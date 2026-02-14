@@ -51,8 +51,9 @@ Flight PHP is a micro framework with route-based architecture. Key conventions:
   - **D**ependency Inversion — depend on abstractions, not concretions; inject dependencies
 - Keep classes small and methods short. Favor composition over inheritance.
 - Name things clearly — code should read like prose, not puzzles.
+- Prefer to throw exceptions instead of returning after printing a JSON.
 
-## Domain Concepts
+# Domain Concepts
 
 - **Community**: a group of people (e.g. a family) sharing expenses
 - **Member**: a person in the community with an income

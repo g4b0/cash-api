@@ -14,6 +14,14 @@ use Exception;
  * @method static self INVALID_TOKEN_TYPE()
  * @method static self INVALID_OR_EXPIRED_TOKEN()
  * @method static self UNAUTHORIZED()
+ * @method static self AMOUNT_MUST_BE_POSITIVE()
+ * @method static self REASON_REQUIRED()
+ * @method static self INVALID_DATE_FORMAT()
+ * @method static self INVALID_CONTRIBUTION_PERCENTAGE()
+ * @method static self INCOME_NOT_FOUND()
+ * @method static self EXPENSE_NOT_FOUND()
+ * @method static self FORBIDDEN()
+ * @method static self MEMBER_NOT_FOUND()
  */
 class AppException extends Exception
 {
@@ -24,6 +32,14 @@ class AppException extends Exception
     public const INVALID_TOKEN_TYPE = 'Invalid token type';
     public const INVALID_OR_EXPIRED_TOKEN = 'Invalid or expired refresh token';
     public const UNAUTHORIZED = 'Unauthorized';
+    public const AMOUNT_MUST_BE_POSITIVE = 'Amount must be greater than zero';
+    public const REASON_REQUIRED = 'Reason is required';
+    public const INVALID_DATE_FORMAT = 'Invalid date format. Use YYYY-MM-DD';
+    public const INVALID_CONTRIBUTION_PERCENTAGE = 'Contribution percentage must be between 0 and 100';
+    public const INCOME_NOT_FOUND = 'Income record not found';
+    public const EXPENSE_NOT_FOUND = 'Expense record not found';
+    public const FORBIDDEN = 'You do not have permission to access this resource';
+    public const MEMBER_NOT_FOUND = 'Member not found';
 
     private string $errorKey;
 
@@ -52,6 +68,12 @@ class AppException extends Exception
             case 'INVALID_OR_EXPIRED_TOKEN':
             case 'UNAUTHORIZED':
                 return 401;
+            case 'FORBIDDEN':
+                return 403;
+            case 'INCOME_NOT_FOUND':
+            case 'EXPENSE_NOT_FOUND':
+            case 'MEMBER_NOT_FOUND':
+                return 404;
             default:
                 return 400;
         }
