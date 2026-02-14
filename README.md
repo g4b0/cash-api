@@ -7,11 +7,14 @@ A backend REST API for managing shared finances in small communities (e.g., fami
 ## Features
 
 - **JWT Authentication**: Secure login with access and refresh tokens
+- **Income & Expense Management**: Full CRUD operations for income and expense records
 - **Progressive Contribution**: Contribution percentage scales with income relative to median
 - **Member Dashboard**: View balance (contributions minus expenses)
+- **Input Validation**: Centralized validator with comprehensive error handling
 - **REST API**: JSON responses, built with Flight PHP v3
 - **CLI Commands**: Manage communities and members from the terminal
-- **Full Test Coverage**: TDD approach with PHPUnit (33 tests, 82 assertions)
+- **OpenAPI Specification**: Complete API documentation (importable to ApiDog, Postman, etc.)
+- **Full Test Coverage**: TDD approach with PHPUnit (96 tests, 211 assertions)
 
 ## Tech Stack
 
@@ -57,9 +60,16 @@ php7.4 -S localhost:8000
 
 ## API Endpoints
 
-### Authentication
+**📄 Complete API documentation**: See [`openapi.yaml`](./openapi.yaml) for the full OpenAPI 3.0 specification (importable to ApiDog, Postman, Swagger, etc.)
 
-**POST /login**
+### Authentication (Public Routes)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/login` | Authenticate and get JWT tokens |
+| POST | `/refresh` | Refresh JWT tokens |
+
+**Example: Login**
 ```bash
 curl -X POST http://localhost:8000/login \
   -H "Content-Type: application/json" \
@@ -74,29 +84,83 @@ Response:
 }
 ```
 
-**POST /refresh**
-```bash
-curl -X POST http://localhost:8000/refresh \
-  -H "Content-Type: application/json" \
-  -d '{"refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGc..."}'
-```
+### Dashboard (Authenticated)
 
-### Dashboard
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/{community_id}/{member_id}` | Get member's balance and transaction history |
 
-**GET /:community_id/:member_id**
+**Example: Get Dashboard**
 ```bash
 curl http://localhost:8000/1/1 \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..."
 ```
 
-Response:
-```json
-{
-  "balance": 625.0
-}
+**Balance calculation**: `SUM(income × contribution_percentage ÷ 100) - SUM(expenses)`
+
+### Income Management (Authenticated)
+
+| Method | Endpoint | Description | Authorization |
+|--------|----------|-------------|---------------|
+| POST | `/income` | Create income record | Owner only |
+| GET | `/income/{id}` | Get income record | Same community |
+| PATCH | `/income/{id}` | Update income record | Owner only |
+| DELETE | `/income/{id}` | Delete income record | Owner only |
+
+**Example: Create Income**
+```bash
+curl -X POST http://localhost:8000/income \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 1000.50,
+    "reason": "Monthly salary",
+    "date": "2025-02-14",
+    "contribution_percentage": 80
+  }'
 ```
 
-**Balance calculation**: `SUM(income * contribution_percentage / 100) - SUM(expenses)`
+**Fields:**
+- `amount` (required): Must be > 0
+- `reason` (required): Description of income
+- `date` (optional): Defaults to today (format: YYYY-MM-DD)
+- `contribution_percentage` (optional): Defaults to member's current percentage (0-100)
+
+### Expense Management (Authenticated)
+
+| Method | Endpoint | Description | Authorization |
+|--------|----------|-------------|---------------|
+| POST | `/expense` | Create expense record | Owner only |
+| GET | `/expense/{id}` | Get expense record | Same community |
+| PATCH | `/expense/{id}` | Update expense record | Owner only |
+| DELETE | `/expense/{id}` | Delete expense record | Owner only |
+
+**Example: Create Expense**
+```bash
+curl -X POST http://localhost:8000/expense \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 500.75,
+    "reason": "Groceries",
+    "date": "2025-02-14"
+  }'
+```
+
+**Fields:**
+- `amount` (required): Must be > 0
+- `reason` (required): Description of expense
+- `date` (optional): Defaults to today (format: YYYY-MM-DD)
+
+**Example: Update Expense (Partial)**
+```bash
+curl -X PATCH http://localhost:8000/expense/1 \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 600}'
+```
+
+All fields are optional in PATCH requests - only provided fields will be updated.
 
 ## CLI Commands
 
@@ -162,16 +226,18 @@ cash/
 │   └── cash.db            # SQLite database (created after init)
 ├── src/
 │   ├── Command/           # CLI command classes
-│   ├── Controller/        # HTTP controllers
-│   ├── Exception/         # Custom exceptions
+│   ├── Controller/        # HTTP controllers (Auth, Dashboard, Income, Expense)
+│   ├── Exception/         # Custom exceptions (AppException)
 │   ├── Middleware/        # JWT auth & exception handling
 │   ├── Service/           # Business logic (JWT, balance calc)
+│   ├── Validation/        # Input validators (shared Validator class)
 │   └── routes.php         # Route definitions
 ├── tests/
-│   ├── Feature/           # Feature/integration tests
-│   ├── Unit/              # Unit tests
+│   ├── Feature/           # Feature/integration tests (HTTP routes)
+│   ├── Unit/              # Unit tests (validators, exceptions, commands)
 │   └── Support/           # Test helpers (DatabaseSeeder)
 ├── index.php              # Application entry point
+├── openapi.yaml           # OpenAPI 3.0 specification (API documentation)
 └── composer.json          # Dependencies
 ```
 

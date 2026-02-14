@@ -1,0 +1,676 @@
+openapi: 3.0.3
+info:
+  title: Cash API
+  description: Backend for small-community (e.g. family) shared finances management
+  version: 1.0.0
+  contact:
+    name: Cash API
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+tags:
+  - name: Authentication
+    description: User authentication and token management
+  - name: Dashboard
+    description: Member financial dashboard
+  - name: Income
+    description: Income record management
+  - name: Expense
+    description: Expense record management
+
+paths:
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user and get JWT tokens
+      description: Validates username and password, returns access and refresh tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: testuser
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    description: JWT access token (1 hour expiry)
+                    example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+                  refresh_token:
+                    type: string
+                    description: JWT refresh token (7 days expiry)
+                    example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+        '400':
+          description: Missing username or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh JWT tokens
+      description: Accepts a refresh token and returns new access and refresh tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+                  description: Valid refresh token
+                  example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+      responses:
+        '200':
+          description: Tokens refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    description: New JWT access token
+                  refresh_token:
+                    type: string
+                    description: New JWT refresh token
+        '400':
+          description: Refresh token required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /{community_id}/{member_id}:
+    get:
+      tags:
+        - Dashboard
+      summary: Get member's financial dashboard
+      description: Returns transaction history and calculated balance for a member
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Community ID
+          example: 1
+        - name: member_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Member ID
+          example: 1
+      responses:
+        '200':
+          description: Dashboard data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: number
+                    format: float
+                    description: Calculated balance (positive = debit, negative = credit)
+                    example: 750.5
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          description: Unauthorized - missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - member not found or access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /income:
+    post:
+      tags:
+        - Income
+      summary: Create income record
+      description: Creates a new income record for the authenticated user
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - reason
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  minimum: 0.01
+                  description: Income amount (must be > 0)
+                  example: 1000.50
+                reason:
+                  type: string
+                  minLength: 1
+                  description: Reason for income
+                  example: Monthly salary
+                date:
+                  type: string
+                  format: date
+                  description: Income date (defaults to today if not provided)
+                  example: '2025-02-14'
+                contribution_percentage:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                  description: Contribution percentage (defaults to member's current percentage)
+                  example: 80
+      responses:
+        '201':
+          description: Income created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Income'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - member not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /income/{id}:
+    get:
+      tags:
+        - Income
+      summary: Get income record by ID
+      description: Retrieves an income record (accessible to all members in the same community)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Income record ID
+          example: 1
+      responses:
+        '200':
+          description: Income retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Income'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - not in same community
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Income not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      tags:
+        - Income
+      summary: Update income record
+      description: Updates an income record (only the owner can modify)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Income record ID
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  minimum: 0.01
+                  example: 1200.00
+                reason:
+                  type: string
+                  minLength: 1
+                  example: Updated salary
+                date:
+                  type: string
+                  format: date
+                  example: '2025-02-15'
+                contribution_percentage:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                  example: 85
+      responses:
+        '200':
+          description: Income updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Income'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - not the owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Income not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Income
+      summary: Delete income record
+      description: Deletes an income record (only the owner can delete)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Income record ID
+          example: 1
+      responses:
+        '204':
+          description: Income deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - not the owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Income not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /expense:
+    post:
+      tags:
+        - Expense
+      summary: Create expense record
+      description: Creates a new expense record for the authenticated user
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - reason
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  minimum: 0.01
+                  description: Expense amount (must be > 0)
+                  example: 500.75
+                reason:
+                  type: string
+                  minLength: 1
+                  description: Reason for expense
+                  example: Groceries
+                date:
+                  type: string
+                  format: date
+                  description: Expense date (defaults to today if not provided)
+                  example: '2025-02-14'
+      responses:
+        '201':
+          description: Expense created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - member not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /expense/{id}:
+    get:
+      tags:
+        - Expense
+      summary: Get expense record by ID
+      description: Retrieves an expense record (accessible to all members in the same community)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Expense record ID
+          example: 1
+      responses:
+        '200':
+          description: Expense retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - not in same community
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Expense not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      tags:
+        - Expense
+      summary: Update expense record
+      description: Updates an expense record (only the owner can modify)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Expense record ID
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  minimum: 0.01
+                  example: 600.00
+                reason:
+                  type: string
+                  minLength: 1
+                  example: Updated groceries
+                date:
+                  type: string
+                  format: date
+                  example: '2025-02-15'
+      responses:
+        '200':
+          description: Expense updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - not the owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Expense not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Expense
+      summary: Delete expense record
+      description: Deletes an expense record (only the owner can delete)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Expense record ID
+          example: 1
+      responses:
+        '204':
+          description: Expense deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - not the owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Expense not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token obtained from /login endpoint
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: Invalid credentials
+
+    Income:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        owner_id:
+          type: integer
+          description: Member ID who owns this income
+          example: 1
+        date:
+          type: string
+          format: date
+          example: '2025-02-14'
+        reason:
+          type: string
+          example: Monthly salary
+        amount:
+          type: string
+          description: Amount as decimal string
+          example: '1000.50'
+        contribution_percentage:
+          type: integer
+          description: Percentage contributed to common account
+          example: 80
+        created_at:
+          type: string
+          format: date-time
+          example: '2025-02-14 10:30:00'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2025-02-14 10:30:00'
+
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        owner_id:
+          type: integer
+          description: Member ID who owns this expense
+          example: 1
+        date:
+          type: string
+          format: date
+          example: '2025-02-14'
+        reason:
+          type: string
+          example: Groceries
+        amount:
+          type: string
+          description: Amount as decimal string
+          example: '500.75'
+        created_at:
+          type: string
+          format: date-time
+          example: '2025-02-14 10:30:00'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2025-02-14 10:30:00'
