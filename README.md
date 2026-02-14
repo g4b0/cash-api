@@ -202,8 +202,11 @@ All fields are optional in PATCH requests - only provided fields will be updated
 ## Running Tests
 
 ```bash
-# Run all tests
+# Run all tests (may show "risky test" warnings - these are harmless)
 php7.4 ./vendor/bin/phpunit
+
+# Run with clean output (no risky warnings)
+php7.4 ./vendor/bin/phpunit --dont-report-useless-tests
 
 # Run with verbose output
 php7.4 ./vendor/bin/phpunit --testdox
@@ -212,6 +215,8 @@ php7.4 ./vendor/bin/phpunit --testdox
 php7.4 ./vendor/bin/phpunit tests/Feature/
 php7.4 ./vendor/bin/phpunit tests/Unit/
 ```
+
+**Note on "risky test" warnings**: Flight PHP's output buffering can cause PHPUnit to report tests as "risky". This is expected behavior and doesn't affect test correctness or application functionality. The warnings are suppressed with `--dont-report-useless-tests` or by the `phpunit.xml` configuration (tests won't fail, warnings just display).
 
 ## Project Structure
 
