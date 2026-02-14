@@ -8,20 +8,18 @@ use App\Repository\TransactionRepository;
 use App\Validation\Validator;
 use flight\Engine;
 
-class TransactionsController
+class TransactionsController extends Controller
 {
-    private Engine $app;
     private Validator $validator;
     private MemberRepository $memberRepository;
     private TransactionRepository $transactionRepository;
 
     public function __construct(Engine $app)
     {
-        $this->app = $app;
+        parent::__construct($app);
         $this->validator = new Validator();
-        $db = $app->get('db');
-        $this->memberRepository = new MemberRepository($db);
-        $this->transactionRepository = new TransactionRepository($db);
+        $this->memberRepository = new MemberRepository($this->getDb());
+        $this->transactionRepository = new TransactionRepository($this->getDb());
     }
 
     public function list(
@@ -31,7 +29,7 @@ class TransactionsController
         ?string $page = null
     ): void {
         // Get authenticated user
-        $authUser = $this->app->get('auth_user');
+        $authUser = $this->getAuthUser();
         $authCommunityId = (int) $authUser->cid;
 
         // Verify requested member exists and belongs to a community
@@ -67,7 +65,7 @@ class TransactionsController
         );
 
         // Return response with data and pagination metadata
-        $this->app->json([
+        $this->json([
             'data' => $transactions,
             'pagination' => [
                 'current_page' => $currentPage,

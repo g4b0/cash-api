@@ -8,26 +8,24 @@ use App\Repository\MemberRepository;
 use App\Validation\Validator;
 use flight\Engine;
 
-class IncomeController
+class IncomeController extends Controller
 {
-    private Engine $app;
     private Validator $validator;
     private MemberRepository $memberRepository;
     private IncomeRepository $incomeRepository;
 
     public function __construct(Engine $app)
     {
-        $this->app = $app;
+        parent::__construct($app);
         $this->validator = new Validator();
-        $db = $app->get('db');
-        $this->memberRepository = new MemberRepository($db);
-        $this->incomeRepository = new IncomeRepository($db);
+        $this->memberRepository = new MemberRepository($this->getDb());
+        $this->incomeRepository = new IncomeRepository($this->getDb());
     }
 
     public function create(): void
     {
         // 1. Get authenticated user
-        $authUser = $this->app->get('auth_user');
+        $authUser = $this->getAuthUser();
         $ownerId = (int) $authUser->sub;
         $communityId = (int) $authUser->cid;
 
@@ -59,13 +57,13 @@ class IncomeController
         $income = $this->incomeRepository->findById($incomeId);
 
         // 8. Return 201 Created
-        $this->app->json($income, 201);
+        $this->json($income, 201);
     }
 
     public function read(string $id): void
     {
         // 1. Get authenticated user
-        $authUser = $this->app->get('auth_user');
+        $authUser = $this->getAuthUser();
         $communityId = (int) $authUser->cid;
 
         // 2. Fetch income record
@@ -83,13 +81,13 @@ class IncomeController
         }
 
         // 4. Return record
-        $this->app->json($income);
+        $this->json($income);
     }
 
     public function update(string $id): void
     {
         // 1. Get authenticated user
-        $authUser = $this->app->get('auth_user');
+        $authUser = $this->getAuthUser();
         $memberId = (int) $authUser->sub;
 
         // 2. Fetch income record
@@ -128,13 +126,13 @@ class IncomeController
         $updated = $this->incomeRepository->findById((int) $id);
 
         // 7. Return updated record
-        $this->app->json($updated);
+        $this->json($updated);
     }
 
     public function delete(string $id): void
     {
         // 1. Get authenticated user
-        $authUser = $this->app->get('auth_user');
+        $authUser = $this->getAuthUser();
         $memberId = (int) $authUser->sub;
 
         // 2. Fetch income record
@@ -153,6 +151,6 @@ class IncomeController
         $this->incomeRepository->delete((int) $id);
 
         // 5. Return 204 No Content
-        $this->app->json(null, 204);
+        $this->json(null, 204);
     }
 }

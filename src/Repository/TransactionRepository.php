@@ -4,14 +4,8 @@ namespace App\Repository;
 
 use PDO;
 
-class TransactionRepository
+class TransactionRepository extends Repository
 {
-    private PDO $db;
-
-    public function __construct(PDO $db)
-    {
-        $this->db = $db;
-    }
 
     /**
      * Count total transactions for a member.

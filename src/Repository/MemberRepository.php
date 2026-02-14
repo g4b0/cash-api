@@ -4,14 +4,8 @@ namespace App\Repository;
 
 use PDO;
 
-class MemberRepository
+class MemberRepository extends Repository
 {
-    private PDO $db;
-
-    public function __construct(PDO $db)
-    {
-        $this->db = $db;
-    }
 
     /**
      * Find member by ID.

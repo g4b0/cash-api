@@ -7,21 +7,20 @@ use App\Repository\MemberRepository;
 use App\Service\BalanceCalculator;
 use flight\Engine;
 
-class DashboardController
+class DashboardController extends Controller
 {
-    private Engine $app;
     private MemberRepository $memberRepository;
 
     public function __construct(Engine $app)
     {
-        $this->app = $app;
-        $this->memberRepository = new MemberRepository($app->get('db'));
+        parent::__construct($app);
+        $this->memberRepository = new MemberRepository($this->getDb());
     }
 
     public function balance(string $community_id, string $member_id): void
     {
         // Get authenticated user
-        $authUser = $this->app->get('auth_user');
+        $authUser = $this->getAuthUser();
         $authCommunityId = (int) $authUser->cid;
 
         // Verify requested member exists and belongs to a community
@@ -37,10 +36,9 @@ class DashboardController
         }
 
         // Calculate and return balance
-        $db = $this->app->get('db');
-        $calculator = new BalanceCalculator($db);
+        $calculator = new BalanceCalculator($this->getDb());
         $balance = $calculator->calculate((int) $member_id);
 
-        $this->app->json(['balance' => $balance]);
+        $this->json(['balance' => $balance]);
     }
 }

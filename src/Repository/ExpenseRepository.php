@@ -4,14 +4,8 @@ namespace App\Repository;
 
 use PDO;
 
-class ExpenseRepository
+class ExpenseRepository extends Repository
 {
-    private PDO $db;
-
-    public function __construct(PDO $db)
-    {
-        $this->db = $db;
-    }
 
     /**
      * Find expense record by ID.

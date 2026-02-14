@@ -7,15 +7,14 @@ use App\Repository\MemberRepository;
 use App\Service\JwtService;
 use flight\Engine;
 
-class AuthController
+class AuthController extends Controller
 {
-    private Engine $app;
     private MemberRepository $memberRepository;
 
     public function __construct(Engine $app)
     {
-        $this->app = $app;
-        $this->memberRepository = new MemberRepository($app->get('db'));
+        parent::__construct($app);
+        $this->memberRepository = new MemberRepository($this->getDb());
     }
 
     public function login(): void
@@ -39,7 +38,7 @@ class AuthController
 
         $jwtService = new JwtService($this->app->get('jwt_secret'));
 
-        $this->app->json([
+        $this->json([
             'access_token' => $jwtService->generateAccessToken((int) $member['id'], (int) $member['community_id']),
             'refresh_token' => $jwtService->generateRefreshToken((int) $member['id'], (int) $member['community_id']),
         ]);
@@ -62,7 +61,7 @@ class AuthController
                 throw AppException::INVALID_TOKEN_TYPE();
             }
 
-            $this->app->json([
+            $this->json([
                 'access_token' => $jwtService->generateAccessToken((int) $decoded->sub, (int) $decoded->cid),
                 'refresh_token' => $jwtService->generateRefreshToken((int) $decoded->sub, (int) $decoded->cid),
             ]);

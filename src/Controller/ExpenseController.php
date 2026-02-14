@@ -8,26 +8,24 @@ use App\Repository\MemberRepository;
 use App\Validation\Validator;
 use flight\Engine;
 
-class ExpenseController
+class ExpenseController extends Controller
 {
-    private Engine $app;
     private Validator $validator;
     private MemberRepository $memberRepository;
     private ExpenseRepository $expenseRepository;
 
     public function __construct(Engine $app)
     {
-        $this->app = $app;
+        parent::__construct($app);
         $this->validator = new Validator();
-        $db = $app->get('db');
-        $this->memberRepository = new MemberRepository($db);
-        $this->expenseRepository = new ExpenseRepository($db);
+        $this->memberRepository = new MemberRepository($this->getDb());
+        $this->expenseRepository = new ExpenseRepository($this->getDb());
     }
 
     public function create(): void
     {
         // 1. Get authenticated user
-        $authUser = $this->app->get('auth_user');
+        $authUser = $this->getAuthUser();
         $ownerId = (int) $authUser->sub;
         $communityId = (int) $authUser->cid;
 
@@ -53,13 +51,13 @@ class ExpenseController
         $expense = $this->expenseRepository->findById($expenseId);
 
         // 7. Return 201 Created
-        $this->app->json($expense, 201);
+        $this->json($expense, 201);
     }
 
     public function read(string $id): void
     {
         // 1. Get authenticated user
-        $authUser = $this->app->get('auth_user');
+        $authUser = $this->getAuthUser();
         $communityId = (int) $authUser->cid;
 
         // 2. Fetch expense record
@@ -77,13 +75,13 @@ class ExpenseController
         }
 
         // 4. Return record
-        $this->app->json($expense);
+        $this->json($expense);
     }
 
     public function update(string $id): void
     {
         // 1. Get authenticated user
-        $authUser = $this->app->get('auth_user');
+        $authUser = $this->getAuthUser();
         $memberId = (int) $authUser->sub;
 
         // 2. Fetch expense record
@@ -119,13 +117,13 @@ class ExpenseController
         $updated = $this->expenseRepository->findById((int) $id);
 
         // 7. Return updated record
-        $this->app->json($updated);
+        $this->json($updated);
     }
 
     public function delete(string $id): void
     {
         // 1. Get authenticated user
-        $authUser = $this->app->get('auth_user');
+        $authUser = $this->getAuthUser();
         $memberId = (int) $authUser->sub;
 
         // 2. Fetch expense record
@@ -144,6 +142,6 @@ class ExpenseController
         $this->expenseRepository->delete((int) $id);
 
         // 5. Return 204 No Content
-        $this->app->json(null, 204);
+        $this->json(null, 204);
     }
 }

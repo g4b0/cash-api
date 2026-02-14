@@ -4,14 +4,8 @@ namespace App\Repository;
 
 use PDO;
 
-class IncomeRepository
+class IncomeRepository extends Repository
 {
-    private PDO $db;
-
-    public function __construct(PDO $db)
-    {
-        $this->db = $db;
-    }
 
     /**
      * Find income record by ID.
