@@ -3,17 +3,19 @@
 namespace App\Controller;
 
 use App\Exception\AppException;
+use App\Repository\MemberRepository;
 use App\Service\JwtService;
 use flight\Engine;
-use PDO;
 
 class AuthController
 {
     private Engine $app;
+    private MemberRepository $memberRepository;
 
     public function __construct(Engine $app)
     {
         $this->app = $app;
+        $this->memberRepository = new MemberRepository($app->get('db'));
     }
 
     public function login(): void
@@ -29,10 +31,7 @@ class AuthController
             throw AppException::PASSWORD_REQUIRED();
         }
 
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT id, community_id, password FROM member WHERE username = ?');
-        $stmt->execute([$username]);
-        $member = $stmt->fetch(PDO::FETCH_ASSOC);
+        $member = $this->memberRepository->findByUsername($username);
 
         if (!$member || !password_verify($password, $member['password'])) {
             throw AppException::INVALID_CREDENTIALS();

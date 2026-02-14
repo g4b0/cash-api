@@ -3,19 +3,25 @@
 namespace App\Controller;
 
 use App\Exception\AppException;
+use App\Repository\ExpenseRepository;
+use App\Repository\MemberRepository;
 use App\Validation\Validator;
 use flight\Engine;
-use PDO;
 
 class ExpenseController
 {
     private Engine $app;
     private Validator $validator;
+    private MemberRepository $memberRepository;
+    private ExpenseRepository $expenseRepository;
 
     public function __construct(Engine $app)
     {
         $this->app = $app;
         $this->validator = new Validator();
+        $db = $app->get('db');
+        $this->memberRepository = new MemberRepository($db);
+        $this->expenseRepository = new ExpenseRepository($db);
     }
 
     public function create(): void
@@ -26,10 +32,7 @@ class ExpenseController
         $communityId = (int) $authUser->cid;
 
         // 2. Verify member exists and belongs to community
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT id FROM member WHERE id = ? AND community_id = ?');
-        $stmt->execute([$ownerId, $communityId]);
-        $member = $stmt->fetch(PDO::FETCH_ASSOC);
+        $member = $this->memberRepository->findByIdInCommunity($ownerId, $communityId);
 
         if (!$member) {
             throw AppException::FORBIDDEN();
@@ -43,15 +46,11 @@ class ExpenseController
         $reason = $this->validator->validateReason($data->reason ?? null);
         $date = $this->validator->validateDate($data->date ?? null);
 
-        // 5. Insert expense record (no contribution_percentage for expenses)
-        $stmt = $db->prepare('INSERT INTO expense (owner_id, date, reason, amount) VALUES (?, ?, ?, ?)');
-        $stmt->execute([$ownerId, $date, $reason, $amount]);
-        $expenseId = $db->lastInsertId();
+        // 5. Create expense record
+        $expenseId = $this->expenseRepository->create($ownerId, $date, $reason, $amount);
 
         // 6. Fetch created record
-        $stmt = $db->prepare('SELECT * FROM expense WHERE id = ?');
-        $stmt->execute([$expenseId]);
-        $expense = $stmt->fetch(PDO::FETCH_ASSOC);
+        $expense = $this->expenseRepository->findById($expenseId);
 
         // 7. Return 201 Created
         $this->app->json($expense, 201);
@@ -64,21 +63,16 @@ class ExpenseController
         $communityId = (int) $authUser->cid;
 
         // 2. Fetch expense record
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT * FROM expense WHERE id = ?');
-        $stmt->execute([$id]);
-        $expense = $stmt->fetch(PDO::FETCH_ASSOC);
+        $expense = $this->expenseRepository->findById((int) $id);
 
         if (!$expense) {
             throw AppException::EXPENSE_NOT_FOUND();
         }
 
         // 3. Verify community access (fetch owner's community)
-        $stmt = $db->prepare('SELECT community_id FROM member WHERE id = ?');
-        $stmt->execute([$expense['owner_id']]);
-        $ownerCommunityId = $stmt->fetchColumn();
+        $ownerCommunityId = $this->memberRepository->getCommunityId((int) $expense['owner_id']);
 
-        if ((int) $ownerCommunityId !== $communityId) {
+        if ($ownerCommunityId !== $communityId) {
             throw AppException::FORBIDDEN();
         }
 
@@ -93,10 +87,7 @@ class ExpenseController
         $memberId = (int) $authUser->sub;
 
         // 2. Fetch expense record
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT * FROM expense WHERE id = ?');
-        $stmt->execute([$id]);
-        $expense = $stmt->fetch(PDO::FETCH_ASSOC);
+        $expense = $this->expenseRepository->findById((int) $id);
 
         if (!$expense) {
             throw AppException::EXPENSE_NOT_FOUND();
@@ -110,33 +101,22 @@ class ExpenseController
         // 4. Get request data and validate provided fields
         $data = $this->app->request()->data;
         $updates = [];
-        $params = [];
 
         if (isset($data->amount)) {
-            $updates[] = 'amount = ?';
-            $params[] = $this->validator->validateAmount($data->amount);
+            $updates['amount'] = $this->validator->validateAmount($data->amount);
         }
         if (isset($data->reason)) {
-            $updates[] = 'reason = ?';
-            $params[] = $this->validator->validateReason($data->reason);
+            $updates['reason'] = $this->validator->validateReason($data->reason);
         }
         if (isset($data->date)) {
-            $updates[] = 'date = ?';
-            $params[] = $this->validator->validateDate($data->date);
+            $updates['date'] = $this->validator->validateDate($data->date);
         }
 
-        // 5. Execute update if fields provided
-        if (!empty($updates)) {
-            $params[] = $id;
-            $sql = 'UPDATE expense SET ' . implode(', ', $updates) . ' WHERE id = ?';
-            $stmt = $db->prepare($sql);
-            $stmt->execute($params);
-        }
+        // 5. Execute update
+        $this->expenseRepository->update((int) $id, $updates);
 
         // 6. Fetch updated record
-        $stmt = $db->prepare('SELECT * FROM expense WHERE id = ?');
-        $stmt->execute([$id]);
-        $updated = $stmt->fetch(PDO::FETCH_ASSOC);
+        $updated = $this->expenseRepository->findById((int) $id);
 
         // 7. Return updated record
         $this->app->json($updated);
@@ -149,10 +129,7 @@ class ExpenseController
         $memberId = (int) $authUser->sub;
 
         // 2. Fetch expense record
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT owner_id FROM expense WHERE id = ?');
-        $stmt->execute([$id]);
-        $expense = $stmt->fetch(PDO::FETCH_ASSOC);
+        $expense = $this->expenseRepository->findById((int) $id);
 
         if (!$expense) {
             throw AppException::EXPENSE_NOT_FOUND();
@@ -164,8 +141,7 @@ class ExpenseController
         }
 
         // 4. Delete record
-        $stmt = $db->prepare('DELETE FROM expense WHERE id = ?');
-        $stmt->execute([$id]);
+        $this->expenseRepository->delete((int) $id);
 
         // 5. Return 204 No Content
         $this->app->json(null, 204);

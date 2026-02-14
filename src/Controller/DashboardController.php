@@ -3,17 +3,19 @@
 namespace App\Controller;
 
 use App\Exception\AppException;
+use App\Repository\MemberRepository;
 use App\Service\BalanceCalculator;
 use flight\Engine;
-use PDO;
 
 class DashboardController
 {
     private Engine $app;
+    private MemberRepository $memberRepository;
 
     public function __construct(Engine $app)
     {
         $this->app = $app;
+        $this->memberRepository = new MemberRepository($app->get('db'));
     }
 
     public function balance(string $community_id, string $member_id): void
@@ -23,21 +25,19 @@ class DashboardController
         $authCommunityId = (int) $authUser->cid;
 
         // Verify requested member exists and belongs to a community
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT community_id FROM member WHERE id = ?');
-        $stmt->execute([$member_id]);
-        $member = $stmt->fetch(PDO::FETCH_ASSOC);
+        $memberCommunityId = $this->memberRepository->getCommunityId((int) $member_id);
 
-        if (!$member) {
+        if ($memberCommunityId === null) {
             throw AppException::MEMBER_NOT_FOUND();
         }
 
         // Verify auth user is from the same community as requested member
-        if ((int) $member['community_id'] !== $authCommunityId) {
+        if ($memberCommunityId !== $authCommunityId) {
             throw AppException::FORBIDDEN();
         }
 
         // Calculate and return balance
+        $db = $this->app->get('db');
         $calculator = new BalanceCalculator($db);
         $balance = $calculator->calculate((int) $member_id);
 

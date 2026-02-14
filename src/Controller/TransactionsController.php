@@ -3,19 +3,25 @@
 namespace App\Controller;
 
 use App\Exception\AppException;
+use App\Repository\MemberRepository;
+use App\Repository\TransactionRepository;
 use App\Validation\Validator;
 use flight\Engine;
-use PDO;
 
 class TransactionsController
 {
     private Engine $app;
     private Validator $validator;
+    private MemberRepository $memberRepository;
+    private TransactionRepository $transactionRepository;
 
     public function __construct(Engine $app)
     {
         $this->app = $app;
         $this->validator = new Validator();
+        $db = $app->get('db');
+        $this->memberRepository = new MemberRepository($db);
+        $this->transactionRepository = new TransactionRepository($db);
     }
 
     public function list(
@@ -29,17 +35,14 @@ class TransactionsController
         $authCommunityId = (int) $authUser->cid;
 
         // Verify requested member exists and belongs to a community
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT community_id FROM member WHERE id = ?');
-        $stmt->execute([$member_id]);
-        $member = $stmt->fetch(PDO::FETCH_ASSOC);
+        $memberCommunityId = $this->memberRepository->getCommunityId((int) $member_id);
 
-        if (!$member) {
+        if ($memberCommunityId === null) {
             throw AppException::MEMBER_NOT_FOUND();
         }
 
         // Verify auth user is from the same community as requested member
-        if ((int) $member['community_id'] !== $authCommunityId) {
+        if ($memberCommunityId !== $authCommunityId) {
             throw AppException::FORBIDDEN();
         }
 
@@ -48,15 +51,7 @@ class TransactionsController
         $currentPage = $this->validator->validatePage($page);
 
         // Count total items
-        $stmt = $db->prepare('
-            SELECT COUNT(*) FROM (
-                SELECT id FROM income WHERE owner_id = ?
-                UNION ALL
-                SELECT id FROM expense WHERE owner_id = ?
-            )
-        ');
-        $stmt->execute([$member_id, $member_id]);
-        $totalItems = (int) $stmt->fetchColumn();
+        $totalItems = $this->transactionRepository->countByMemberId((int) $member_id);
 
         // Calculate total pages
         $totalPages = $totalItems > 0 ? (int) ceil($totalItems / $perPage) : 0;
@@ -65,37 +60,11 @@ class TransactionsController
         $offset = ($currentPage - 1) * $perPage;
 
         // Fetch paginated data
-        $stmt = $db->prepare('
-            SELECT * FROM (
-                SELECT
-                    id,
-                    "income" as type,
-                    date,
-                    reason,
-                    amount,
-                    contribution_percentage,
-                    created_at,
-                    updated_at
-                FROM income WHERE owner_id = ?
-
-                UNION ALL
-
-                SELECT
-                    id,
-                    "expense" as type,
-                    date,
-                    reason,
-                    amount,
-                    NULL as contribution_percentage,
-                    created_at,
-                    updated_at
-                FROM expense WHERE owner_id = ?
-            )
-            ORDER BY date DESC
-            LIMIT ? OFFSET ?
-        ');
-        $stmt->execute([$member_id, $member_id, $perPage, $offset]);
-        $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $transactions = $this->transactionRepository->findPaginatedByMemberId(
+            (int) $member_id,
+            $perPage,
+            $offset
+        );
 
         // Return response with data and pagination metadata
         $this->app->json([

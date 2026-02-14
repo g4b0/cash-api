@@ -3,19 +3,25 @@
 namespace App\Controller;
 
 use App\Exception\AppException;
+use App\Repository\IncomeRepository;
+use App\Repository\MemberRepository;
 use App\Validation\Validator;
 use flight\Engine;
-use PDO;
 
 class IncomeController
 {
     private Engine $app;
     private Validator $validator;
+    private MemberRepository $memberRepository;
+    private IncomeRepository $incomeRepository;
 
     public function __construct(Engine $app)
     {
         $this->app = $app;
         $this->validator = new Validator();
+        $db = $app->get('db');
+        $this->memberRepository = new MemberRepository($db);
+        $this->incomeRepository = new IncomeRepository($db);
     }
 
     public function create(): void
@@ -26,10 +32,7 @@ class IncomeController
         $communityId = (int) $authUser->cid;
 
         // 2. Verify member exists and belongs to community
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT contribution_percentage FROM member WHERE id = ? AND community_id = ?');
-        $stmt->execute([$ownerId, $communityId]);
-        $member = $stmt->fetch(PDO::FETCH_ASSOC);
+        $member = $this->memberRepository->findByIdInCommunity($ownerId, $communityId);
 
         if (!$member) {
             throw AppException::FORBIDDEN();
@@ -49,15 +52,11 @@ class IncomeController
             $contributionPercentage = (int) $member['contribution_percentage'];
         }
 
-        // 6. Insert income record
-        $stmt = $db->prepare('INSERT INTO income (owner_id, date, reason, amount, contribution_percentage) VALUES (?, ?, ?, ?, ?)');
-        $stmt->execute([$ownerId, $date, $reason, $amount, $contributionPercentage]);
-        $incomeId = $db->lastInsertId();
+        // 6. Create income record
+        $incomeId = $this->incomeRepository->create($ownerId, $date, $reason, $amount, $contributionPercentage);
 
         // 7. Fetch created record
-        $stmt = $db->prepare('SELECT * FROM income WHERE id = ?');
-        $stmt->execute([$incomeId]);
-        $income = $stmt->fetch(PDO::FETCH_ASSOC);
+        $income = $this->incomeRepository->findById($incomeId);
 
         // 8. Return 201 Created
         $this->app->json($income, 201);
@@ -70,21 +69,16 @@ class IncomeController
         $communityId = (int) $authUser->cid;
 
         // 2. Fetch income record
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT * FROM income WHERE id = ?');
-        $stmt->execute([$id]);
-        $income = $stmt->fetch(PDO::FETCH_ASSOC);
+        $income = $this->incomeRepository->findById((int) $id);
 
         if (!$income) {
             throw AppException::INCOME_NOT_FOUND();
         }
 
         // 3. Verify community access (fetch owner's community)
-        $stmt = $db->prepare('SELECT community_id FROM member WHERE id = ?');
-        $stmt->execute([$income['owner_id']]);
-        $ownerCommunityId = $stmt->fetchColumn();
+        $ownerCommunityId = $this->memberRepository->getCommunityId((int) $income['owner_id']);
 
-        if ((int) $ownerCommunityId !== $communityId) {
+        if ($ownerCommunityId !== $communityId) {
             throw AppException::FORBIDDEN();
         }
 
@@ -99,10 +93,7 @@ class IncomeController
         $memberId = (int) $authUser->sub;
 
         // 2. Fetch income record
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT * FROM income WHERE id = ?');
-        $stmt->execute([$id]);
-        $income = $stmt->fetch(PDO::FETCH_ASSOC);
+        $income = $this->incomeRepository->findById((int) $id);
 
         if (!$income) {
             throw AppException::INCOME_NOT_FOUND();
@@ -116,37 +107,25 @@ class IncomeController
         // 4. Get request data and validate provided fields
         $data = $this->app->request()->data;
         $updates = [];
-        $params = [];
 
         if (isset($data->amount)) {
-            $updates[] = 'amount = ?';
-            $params[] = $this->validator->validateAmount($data->amount);
+            $updates['amount'] = $this->validator->validateAmount($data->amount);
         }
         if (isset($data->reason)) {
-            $updates[] = 'reason = ?';
-            $params[] = $this->validator->validateReason($data->reason);
+            $updates['reason'] = $this->validator->validateReason($data->reason);
         }
         if (isset($data->date)) {
-            $updates[] = 'date = ?';
-            $params[] = $this->validator->validateDate($data->date);
+            $updates['date'] = $this->validator->validateDate($data->date);
         }
         if (isset($data->contribution_percentage)) {
-            $updates[] = 'contribution_percentage = ?';
-            $params[] = $this->validator->validateContributionPercentage($data->contribution_percentage);
+            $updates['contribution_percentage'] = $this->validator->validateContributionPercentage($data->contribution_percentage);
         }
 
-        // 5. Execute update if fields provided
-        if (!empty($updates)) {
-            $params[] = $id;
-            $sql = 'UPDATE income SET ' . implode(', ', $updates) . ' WHERE id = ?';
-            $stmt = $db->prepare($sql);
-            $stmt->execute($params);
-        }
+        // 5. Execute update
+        $this->incomeRepository->update((int) $id, $updates);
 
         // 6. Fetch updated record
-        $stmt = $db->prepare('SELECT * FROM income WHERE id = ?');
-        $stmt->execute([$id]);
-        $updated = $stmt->fetch(PDO::FETCH_ASSOC);
+        $updated = $this->incomeRepository->findById((int) $id);
 
         // 7. Return updated record
         $this->app->json($updated);
@@ -159,10 +138,7 @@ class IncomeController
         $memberId = (int) $authUser->sub;
 
         // 2. Fetch income record
-        $db = $this->app->get('db');
-        $stmt = $db->prepare('SELECT owner_id FROM income WHERE id = ?');
-        $stmt->execute([$id]);
-        $income = $stmt->fetch(PDO::FETCH_ASSOC);
+        $income = $this->incomeRepository->findById((int) $id);
 
         if (!$income) {
             throw AppException::INCOME_NOT_FOUND();
@@ -174,8 +150,7 @@ class IncomeController
         }
 
         // 4. Delete record
-        $stmt = $db->prepare('DELETE FROM income WHERE id = ?');
-        $stmt->execute([$id]);
+        $this->incomeRepository->delete((int) $id);
 
         // 5. Return 204 No Content
         $this->app->json(null, 204);
