@@ -53,6 +53,94 @@ user-invocable: true
 
 - `index.php`: require autoload, create or get app, set up shared services (`$app->set('db', $pdo)`), register routes, call `$app->start()`.
 
+## Known Issues & Limitations (Potential PRs)
+
+These are Flight PHP v3 limitations that could be improved with upstream PRs:
+
+### Issue 1: `addMiddleware()` Hardcodes 403 Response
+
+**Problem**: `Engine::addMiddleware()` hardcodes `halt(403, 'Forbidden')` when middleware's `before()` returns false (see `Engine.php:652-653`). This makes it impossible to return custom HTTP status codes like 401 Unauthorized.
+
+**Code location**: `Engine.php:652-653`
+```php
+if (!$result) {
+    $this->halt(403, 'Forbidden');  // ❌ Hardcoded, not configurable
+}
+```
+
+**Current workaround**: Use `$app->map('start', ...)` to override the start event instead of using middleware. See "Auth Middleware via map('start')" section above.
+
+**Potential fix**: Allow middleware to throw exceptions or return status codes:
+```php
+if (!$result) {
+    if ($result instanceof Exception) {
+        throw $result;  // Let exception handler decide status
+    }
+    $this->halt(403, 'Forbidden');
+}
+```
+
+### Issue 2: Output Buffering Leaves Buffers Open in Tests
+
+**Problem**: Flight PHP's exception handling leaves output buffers open when exceptions are thrown during tests, causing PHPUnit to mark tests as "risky" with the warning: _"Test code or tested code did not (only) close its own output buffers"_
+
+**Root cause**:
+1. Flight uses output buffering to capture response bodies
+2. Exception handlers (`map('error', ...)`) output JSON directly
+3. Buffers may remain open when execution stops
+4. PHPUnit checks buffer levels and marks tests as risky
+
+**Impact**: Tests pass correctly but PHPUnit reports warnings. Doesn't affect test correctness or production code.
+
+**Current workaround**: Configure PHPUnit to not fail on risky tests:
+```xml
+<!-- phpunit.xml -->
+<phpunit
+    failOnRisky="false"
+    beStrictAboutOutputDuringTests="false">
+    <!-- ... -->
+</phpunit>
+```
+
+Or run with flag:
+```bash
+php vendor/bin/phpunit --dont-report-useless-tests
+```
+
+**Potential fix**: Ensure exception handlers properly clean up output buffers:
+```php
+// In exception handler
+while (ob_get_level() > 1) {  // Keep level 1 for PHPUnit
+    ob_end_clean();
+}
+// Then output error response
+```
+
+### Issue 3: `before('start', ...)` Filter Output Discarded
+
+**Problem**: `Dispatcher::runPreFilters()` discards the `$output` variable, so setting it in a `before('start')` filter has no effect on whether `_start()` runs.
+
+**Code location**: `Dispatcher.php` (the `$output` reference is not used to skip execution)
+
+**Current workaround**: Use `$app->map('start', ...)` instead, which fully replaces the start event handler.
+
+**Potential fix**: Check `$output` after running preFilters and skip `_start()` if output was generated:
+```php
+public function run(string $event, array $params): void {
+    $output = null;
+    $this->runPreFilters($event, $params, $output);
+    if ($output !== null) {
+        return;  // Skip event execution if filter produced output
+    }
+    // Continue with event...
+}
+```
+
+---
+
+**Note**: These issues are documented here for future reference. Consider contributing PRs to Flight PHP v3 to address these limitations.
+
 ## Docs
 
 - Flight PHP v3 docs: https://docs.flightphp.com/en/v3/learn
+- Flight PHP GitHub: https://github.com/mikecao/flight
