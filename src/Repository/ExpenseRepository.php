@@ -73,4 +73,19 @@ class ExpenseRepository extends Repository
         $stmt = $this->db->prepare('DELETE FROM expense WHERE id = ?');
         return $stmt->execute([$id]);
     }
+
+    /**
+     * Calculate total expenses for a member.
+     *
+     * @param int $memberId
+     * @return float Total expenses
+     */
+    public function calculateTotalExpenses(int $memberId): float
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COALESCE(SUM(amount), 0) FROM expense WHERE owner_id = ?'
+        );
+        $stmt->execute([$memberId]);
+        return (float) $stmt->fetchColumn();
+    }
 }

@@ -74,4 +74,20 @@ class IncomeRepository extends Repository
         $stmt = $this->db->prepare('DELETE FROM income WHERE id = ?');
         return $stmt->execute([$id]);
     }
+
+    /**
+     * Calculate total contributions for a member.
+     * Contribution = amount * contribution_percentage / 100
+     *
+     * @param int $memberId
+     * @return float Total contributions
+     */
+    public function calculateTotalContributions(int $memberId): float
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COALESCE(SUM(amount * contribution_percentage / 100.0), 0) FROM income WHERE owner_id = ?'
+        );
+        $stmt->execute([$memberId]);
+        return (float) $stmt->fetchColumn();
+    }
 }

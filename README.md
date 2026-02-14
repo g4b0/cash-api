@@ -295,9 +295,10 @@ cash/
 │   └── cash.db            # SQLite database (created after init)
 ├── src/
 │   ├── Command/           # CLI command classes
-│   ├── Controller/        # HTTP controllers (Auth, Dashboard, Income, Expense)
+│   ├── Controller/        # HTTP controllers (Auth, Dashboard, Income, Expense, Transactions)
 │   ├── Exception/         # Custom exceptions (AppException)
 │   ├── Middleware/        # JWT auth & exception handling
+│   ├── Repository/        # Database queries (Income, Expense, Member, Transaction)
 │   ├── Service/           # Business logic (JWT, balance calc)
 │   ├── Validation/        # Input validators (shared Validator class)
 │   └── routes.php         # Route definitions
@@ -333,6 +334,22 @@ Flight PHP v3's `addMiddleware()` hardcodes 403 responses. The auth middleware u
 ```php
 JwtAuthMiddleware::register($app);  // Protects all routes except /login and /refresh
 ```
+
+### Layered Architecture
+
+The codebase follows a clean three-layer separation of concerns:
+
+**Controllers** → **Services** → **Repositories** → **Database**
+
+- **Controllers** (`src/Controller/`): Handle HTTP concerns (routing, validation, JSON responses)
+- **Services** (`src/Service/`): Contain business logic (e.g., `BalanceCalculator`)
+- **Repositories** (`src/Repository/`): Execute all database queries (one method per query)
+
+**Repository Pattern benefits:**
+- All PDO queries isolated in testable, reusable methods
+- Controllers/services never write SQL directly
+- Each repository method is unit tested in isolation
+- Examples: `IncomeRepository::calculateTotalContributions()`, `ExpenseRepository::findById()`
 
 ### TDD Approach
 

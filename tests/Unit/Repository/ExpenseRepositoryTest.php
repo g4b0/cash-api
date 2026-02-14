@@ -102,4 +102,35 @@ class ExpenseRepositoryTest extends TestCase
 
         $this->assertTrue($result);
     }
+
+    public function testCalculateTotalExpensesReturnsZeroWhenNoExpenses(): void
+    {
+        $result = $this->repository->calculateTotalExpenses($this->memberId);
+
+        $this->assertEquals(0.0, $result);
+    }
+
+    public function testCalculateTotalExpensesReturnsCorrectSum(): void
+    {
+        DatabaseSeeder::seedExpense($this->db, $this->memberId, '2025-02-14', 'Groceries', 500.00);
+        DatabaseSeeder::seedExpense($this->db, $this->memberId, '2025-02-15', 'Utilities', 300.00);
+
+        $result = $this->repository->calculateTotalExpenses($this->memberId);
+
+        // Total expenses = 500 + 300 = 800
+        $this->assertEquals(800.0, $result);
+    }
+
+    public function testCalculateTotalExpensesOnlyIncludesSpecificMember(): void
+    {
+        $member2Id = DatabaseSeeder::seedMember($this->db, $this->communityId, 'Member 2', 'member2', 80);
+
+        DatabaseSeeder::seedExpense($this->db, $this->memberId, '2025-02-14', 'Groceries', 500.00);
+        DatabaseSeeder::seedExpense($this->db, $member2Id, '2025-02-14', 'Other Expense', 1000.00);
+
+        $result = $this->repository->calculateTotalExpenses($this->memberId);
+
+        // Only member1's expenses: 500
+        $this->assertEquals(500.0, $result);
+    }
 }

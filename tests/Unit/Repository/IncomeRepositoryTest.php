@@ -106,4 +106,37 @@ class IncomeRepositoryTest extends TestCase
 
         $this->assertTrue($result);
     }
+
+    public function testCalculateTotalContributionsReturnsZeroWhenNoIncome(): void
+    {
+        $result = $this->repository->calculateTotalContributions($this->memberId);
+
+        $this->assertEquals(0.0, $result);
+    }
+
+    public function testCalculateTotalContributionsReturnsCorrectSum(): void
+    {
+        // Income 1: 1000 * 75% = 750
+        DatabaseSeeder::seedIncome($this->db, $this->memberId, '2025-02-14', 'Salary', 1000.00, 75);
+        // Income 2: 500 * 80% = 400
+        DatabaseSeeder::seedIncome($this->db, $this->memberId, '2025-02-15', 'Bonus', 500.00, 80);
+
+        $result = $this->repository->calculateTotalContributions($this->memberId);
+
+        // Total contributions = 750 + 400 = 1150
+        $this->assertEquals(1150.0, $result);
+    }
+
+    public function testCalculateTotalContributionsOnlyIncludesSpecificMember(): void
+    {
+        $member2Id = DatabaseSeeder::seedMember($this->db, $this->communityId, 'Member 2', 'member2', 80);
+
+        DatabaseSeeder::seedIncome($this->db, $this->memberId, '2025-02-14', 'Salary', 1000.00, 75);
+        DatabaseSeeder::seedIncome($this->db, $member2Id, '2025-02-14', 'Other Salary', 2000.00, 80);
+
+        $result = $this->repository->calculateTotalContributions($this->memberId);
+
+        // Only member1's income: 1000 * 75% = 750
+        $this->assertEquals(750.0, $result);
+    }
 }

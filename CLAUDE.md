@@ -42,6 +42,49 @@ Flight PHP is a micro framework with route-based architecture. Key conventions:
 - The framework entry point is typically a single `index.php` that bootstraps routes and middleware
 - Flight uses `Flight::json()` for JSON responses (this is a REST API backend)
 
+### Layered Architecture
+
+The codebase follows a three-layer architecture for separation of concerns:
+
+**Controllers** (`src/Controller/`)
+- Handle HTTP concerns: request parsing, response formatting, status codes
+- Validate authorization (JWT, ownership checks, community membership)
+- Delegate business logic to services
+- Delegate data access to repositories
+- All controllers extend `Controller` abstract base class
+
+**Services** (`src/Service/`)
+- Contain business logic and domain rules
+- Orchestrate operations across multiple repositories
+- Example: `BalanceCalculator` computes balance from income and expense totals
+
+**Repositories** (`src/Repository/`)
+- Handle all database queries (PDO)
+- One method per query — focused, testable, reusable
+- Return raw arrays or primitive types
+- All repositories extend `Repository` abstract base class
+- Examples: `IncomeRepository`, `ExpenseRepository`, `MemberRepository`, `TransactionRepository`
+
+**Example flow:**
+```
+Request → Controller (auth/validation) → Service (business logic) → Repository (data access) → Database
+```
+
+### Repository Pattern
+
+All database queries are isolated in repository classes. Controllers and services never execute PDO queries directly.
+
+**Benefits:**
+- **Testability**: repositories are unit tested in isolation with in-memory SQLite
+- **Reusability**: same query used by multiple controllers/services
+- **Maintainability**: schema changes affect only repository methods
+- **Readability**: `$repo->findById($id)` is clearer than inline SQL
+
+**Convention:**
+- One repository per table (or logical entity for complex queries like `TransactionRepository`)
+- One method per query
+- Methods named clearly: `findById()`, `create()`, `calculateTotalExpenses()`
+
 ## Development Principles
 
 - **Test-Driven Development (TDD)**: write a failing test first, make it pass, then refactor. Every feature or bug fix starts with a test.

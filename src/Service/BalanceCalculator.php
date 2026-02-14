@@ -2,30 +2,32 @@
 
 namespace App\Service;
 
+use App\Repository\ExpenseRepository;
+use App\Repository\IncomeRepository;
 use PDO;
 
 class BalanceCalculator
 {
-    private PDO $db;
+    private IncomeRepository $incomeRepository;
+    private ExpenseRepository $expenseRepository;
 
     public function __construct(PDO $db)
     {
-        $this->db = $db;
+        $this->incomeRepository = new IncomeRepository($db);
+        $this->expenseRepository = new ExpenseRepository($db);
     }
 
+    /**
+     * Calculate balance for a member.
+     * Balance = Total Contributions - Total Expenses
+     *
+     * @param int $memberId
+     * @return float
+     */
     public function calculate(int $memberId): float
     {
-        $stmt = $this->db->prepare(
-            'SELECT COALESCE(SUM(amount * contribution_percentage / 100.0), 0) FROM income WHERE owner_id = ?'
-        );
-        $stmt->execute([$memberId]);
-        $incomeTotal = (float) $stmt->fetchColumn();
-
-        $stmt = $this->db->prepare(
-            'SELECT COALESCE(SUM(amount), 0) FROM expense WHERE owner_id = ?'
-        );
-        $stmt->execute([$memberId]);
-        $expenseTotal = (float) $stmt->fetchColumn();
+        $incomeTotal = $this->incomeRepository->calculateTotalContributions($memberId);
+        $expenseTotal = $this->expenseRepository->calculateTotalExpenses($memberId);
 
         return $incomeTotal - $expenseTotal;
     }
