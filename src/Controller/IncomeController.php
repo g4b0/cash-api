@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\IncomeCreateDto;
 use App\Exception\AppException;
 use App\Repository\IncomeRepository;
 use App\Repository\MemberRepository;
@@ -36,27 +37,19 @@ class IncomeController extends Controller
             throw AppException::FORBIDDEN();
         }
 
-        // 3. Get request data
-        $data = $this->app->request()->data;
+        // 3. Validate input via DTO
+        $dto = IncomeCreateDto::createFromRequest($this->app->request());
 
-        // 4. Validate required fields
-        $amount = $this->validator->validateAmount($data->amount ?? null);
-        $reason = $this->validator->validateReason($data->reason ?? null);
-        $date = $this->validator->validateDate($data->date ?? null);
+        // 4. Handle contribution_percentage default
+        $contributionPercentage = $dto->contribution_percentage ?? (int) $member['contribution_percentage'];
 
-        // 5. Handle contribution_percentage (optional)
-        $contributionPercentage = $this->validator->validateContributionPercentage($data->contribution_percentage ?? null);
-        if ($contributionPercentage === null) {
-            $contributionPercentage = (int) $member['contribution_percentage'];
-        }
+        // 5. Create income record
+        $incomeId = $this->incomeRepository->create($ownerId, $dto->date, $dto->reason, $dto->amount, $contributionPercentage);
 
-        // 6. Create income record
-        $incomeId = $this->incomeRepository->create($ownerId, $date, $reason, $amount, $contributionPercentage);
-
-        // 7. Fetch created record
+        // 6. Fetch created record
         $income = $this->incomeRepository->findById($incomeId);
 
-        // 8. Return 201 Created
+        // 7. Return 201 Created
         $this->json($income, 201);
     }
 

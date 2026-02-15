@@ -15,7 +15,7 @@ A backend REST API for managing shared finances in small communities (e.g., fami
 - **REST API**: JSON responses, built with Flight PHP v3
 - **CLI Commands**: Manage communities and members from the terminal
 - **OpenAPI Specification**: Complete API documentation (importable to ApiDog, Postman, etc.)
-- **Full Test Coverage**: TDD approach with PHPUnit (121 tests, 285 assertions)
+- **Full Test Coverage**: TDD approach with PHPUnit (171 tests, 393 assertions)
 
 ## Tech Stack
 
@@ -296,6 +296,7 @@ cash/
 ├── src/
 │   ├── Command/           # CLI command classes
 │   ├── Controller/        # HTTP controllers (Auth, Dashboard, Income, Expense, Transactions)
+│   ├── Dto/               # Data Transfer Objects for input validation
 │   ├── Exception/         # Custom exceptions (AppException)
 │   ├── Middleware/        # JWT auth & exception handling
 │   ├── Repository/        # Database queries (Income, Expense, Member, Transaction)

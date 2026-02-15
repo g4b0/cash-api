@@ -85,6 +85,44 @@ All database queries are isolated in repository classes. Controllers and service
 - One method per query
 - Methods named clearly: `findById()`, `create()`, `calculateTotalExpenses()`
 
+### DTO Pattern
+
+Input validation for POST/PUT/PATCH endpoints uses Data Transfer Objects (DTOs).
+
+**Location**: `src/Dto/`
+
+**Naming**: `{Entity}{Operation}Dto` (e.g., `IncomeCreateDto`, `ExpenseUpdateDto`)
+
+**Structure**:
+```php
+class IncomeCreateDto extends Dto
+{
+    public float $amount;           // Type-hinted properties
+    public string $reason;
+    public string $date;
+    public ?int $contribution_percentage;
+
+    public static function createFromRequest(Request $request): self
+    {
+        // Extract data, validate, return DTO instance
+    }
+}
+```
+
+**Usage in Controllers**:
+```php
+$dto = IncomeCreateDto::createFromRequest($this->app->request());
+// Use $dto->amount, $dto->reason, etc. (type-safe properties)
+```
+
+**Benefits**:
+- Type-safe input handling with property type hints
+- Centralized validation logic
+- Reduced controller boilerplate
+- POST payloads align with GET response structure
+
+**Validation**: DTOs delegate to existing `Validator` class methods, maintaining consistency with validation rules and error messages.
+
 ## Development Principles
 
 - **Test-Driven Development (TDD)**: write a failing test first, make it pass, then refactor. Every feature or bug fix starts with a test.
