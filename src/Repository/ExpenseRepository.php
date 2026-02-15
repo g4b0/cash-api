@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Dto\ExpenseCreateDto;
+use App\Dto\ExpenseUpdateDto;
 use PDO;
 
 class ExpenseRepository extends Repository
@@ -22,18 +24,16 @@ class ExpenseRepository extends Repository
     /**
      * Create a new expense record.
      *
+     * @param int $ownerId Member ID who owns this expense
+     * @param ExpenseCreateDto $dto Validated expense data
      * @return int The ID of the created expense record
      */
-    public function create(
-        int $ownerId,
-        string $date,
-        string $reason,
-        float $amount
-    ): int {
+    public function create(int $ownerId, ExpenseCreateDto $dto): int
+    {
         $stmt = $this->db->prepare(
             'INSERT INTO expense (owner_id, date, reason, amount) VALUES (?, ?, ?, ?)'
         );
-        $stmt->execute([$ownerId, $date, $reason, $amount]);
+        $stmt->execute([$ownerId, $dto->date, $dto->reason, $dto->amount]);
 
         return (int) $this->db->lastInsertId();
     }
@@ -41,21 +41,30 @@ class ExpenseRepository extends Repository
     /**
      * Update expense record fields.
      *
-     * @param array $fields Associative array of field => value to update
+     * @param int $id Expense record ID
+     * @param ExpenseUpdateDto $dto Validated update data (only non-null fields will be updated)
      * @return bool True if update was successful
      */
-    public function update(int $id, array $fields): bool
+    public function update(int $id, ExpenseUpdateDto $dto): bool
     {
-        if (empty($fields)) {
-            return true;
-        }
-
         $updates = [];
         $params = [];
 
-        foreach ($fields as $field => $value) {
-            $updates[] = "$field = ?";
-            $params[] = $value;
+        if ($dto->amount !== null) {
+            $updates[] = "amount = ?";
+            $params[] = $dto->amount;
+        }
+        if ($dto->reason !== null) {
+            $updates[] = "reason = ?";
+            $params[] = $dto->reason;
+        }
+        if ($dto->date !== null) {
+            $updates[] = "date = ?";
+            $params[] = $dto->date;
+        }
+
+        if (empty($updates)) {
+            return true;
         }
 
         $params[] = $id;

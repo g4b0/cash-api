@@ -84,6 +84,38 @@ All database queries are isolated in repository classes. Controllers and service
 - One repository per table (or logical entity for complex queries like `TransactionRepository`)
 - One method per query
 - Methods named clearly: `findById()`, `create()`, `calculateTotalExpenses()`
+- **Repositories accept DTOs**: `create()` and `update()` methods receive validated DTO instances
+
+**DTO Usage in Repositories:**
+
+Repositories receive validated DTOs instead of individual parameters:
+
+```php
+// Create method signature
+public function create(int $ownerId, IncomeCreateDto $dto, int $contributionPercentage): int
+{
+    $stmt = $this->db->prepare('INSERT INTO income (owner_id, date, reason, amount, contribution_percentage) VALUES (?, ?, ?, ?, ?)');
+    $stmt->execute([$ownerId, $dto->date, $dto->reason, $dto->amount, $contributionPercentage]);
+    return (int) $this->db->lastInsertId();
+}
+
+// Update method signature
+public function update(int $id, IncomeUpdateDto $dto): bool
+{
+    // Build updates only from non-null DTO properties
+    if ($dto->amount !== null) {
+        $updates[] = "amount = ?";
+        $params[] = $dto->amount;
+    }
+    // ... (repeat for other fields)
+}
+```
+
+**Why DTOs in Repositories:**
+- Data is already validated - no need to pass individual parameters
+- Cleaner method signatures (2-3 params instead of 5+)
+- Type-safe: DTOs guarantee validated, type-correct data
+- Easier to extend: adding new fields only updates DTO, not all call sites
 
 ### DTO Pattern
 

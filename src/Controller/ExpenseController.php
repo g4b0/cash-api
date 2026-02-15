@@ -42,7 +42,7 @@ class ExpenseController extends Controller
         $dto = ExpenseCreateDto::createFromRequest($this->app->request());
 
         // 4. Create expense record
-        $expenseId = $this->expenseRepository->create($ownerId, $dto->date, $dto->reason, $dto->amount);
+        $expenseId = $this->expenseRepository->create($ownerId, $dto);
 
         // 5. Fetch created record
         $expense = $this->expenseRepository->findById($expenseId);
@@ -96,25 +96,13 @@ class ExpenseController extends Controller
         // 4. Validate input via DTO
         $dto = ExpenseUpdateDto::createFromRequest($this->app->request());
 
-        // 5. Build updates array from non-null DTO properties
-        $updates = [];
-        if ($dto->amount !== null) {
-            $updates['amount'] = $dto->amount;
-        }
-        if ($dto->reason !== null) {
-            $updates['reason'] = $dto->reason;
-        }
-        if ($dto->date !== null) {
-            $updates['date'] = $dto->date;
-        }
+        // 5. Execute update
+        $this->expenseRepository->update((int) $id, $dto);
 
-        // 6. Execute update
-        $this->expenseRepository->update((int) $id, $updates);
-
-        // 7. Fetch updated record
+        // 6. Fetch updated record
         $updated = $this->expenseRepository->findById((int) $id);
 
-        // 8. Return updated record
+        // 7. Return updated record
         $this->json($updated);
     }
 

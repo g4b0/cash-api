@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Dto\IncomeCreateDto;
+use App\Dto\IncomeUpdateDto;
 use PDO;
 
 class IncomeRepository extends Repository
@@ -22,19 +24,17 @@ class IncomeRepository extends Repository
     /**
      * Create a new income record.
      *
+     * @param int $ownerId Member ID who owns this income
+     * @param IncomeCreateDto $dto Validated income data
+     * @param int $contributionPercentage Contribution percentage (from DTO or member's default)
      * @return int The ID of the created income record
      */
-    public function create(
-        int $ownerId,
-        string $date,
-        string $reason,
-        float $amount,
-        int $contributionPercentage
-    ): int {
+    public function create(int $ownerId, IncomeCreateDto $dto, int $contributionPercentage): int
+    {
         $stmt = $this->db->prepare(
             'INSERT INTO income (owner_id, date, reason, amount, contribution_percentage) VALUES (?, ?, ?, ?, ?)'
         );
-        $stmt->execute([$ownerId, $date, $reason, $amount, $contributionPercentage]);
+        $stmt->execute([$ownerId, $dto->date, $dto->reason, $dto->amount, $contributionPercentage]);
 
         return (int) $this->db->lastInsertId();
     }
@@ -42,21 +42,34 @@ class IncomeRepository extends Repository
     /**
      * Update income record fields.
      *
-     * @param array $fields Associative array of field => value to update
+     * @param int $id Income record ID
+     * @param IncomeUpdateDto $dto Validated update data (only non-null fields will be updated)
      * @return bool True if update was successful
      */
-    public function update(int $id, array $fields): bool
+    public function update(int $id, IncomeUpdateDto $dto): bool
     {
-        if (empty($fields)) {
-            return true;
-        }
-
         $updates = [];
         $params = [];
 
-        foreach ($fields as $field => $value) {
-            $updates[] = "$field = ?";
-            $params[] = $value;
+        if ($dto->amount !== null) {
+            $updates[] = "amount = ?";
+            $params[] = $dto->amount;
+        }
+        if ($dto->reason !== null) {
+            $updates[] = "reason = ?";
+            $params[] = $dto->reason;
+        }
+        if ($dto->date !== null) {
+            $updates[] = "date = ?";
+            $params[] = $dto->date;
+        }
+        if ($dto->contribution_percentage !== null) {
+            $updates[] = "contribution_percentage = ?";
+            $params[] = $dto->contribution_percentage;
+        }
+
+        if (empty($updates)) {
+            return true;
         }
 
         $params[] = $id;

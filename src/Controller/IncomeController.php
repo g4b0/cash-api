@@ -45,7 +45,7 @@ class IncomeController extends Controller
         $contributionPercentage = $dto->contribution_percentage ?? (int) $member['contribution_percentage'];
 
         // 5. Create income record
-        $incomeId = $this->incomeRepository->create($ownerId, $dto->date, $dto->reason, $dto->amount, $contributionPercentage);
+        $incomeId = $this->incomeRepository->create($ownerId, $dto, $contributionPercentage);
 
         // 6. Fetch created record
         $income = $this->incomeRepository->findById($incomeId);
@@ -99,28 +99,13 @@ class IncomeController extends Controller
         // 4. Validate input via DTO
         $dto = IncomeUpdateDto::createFromRequest($this->app->request());
 
-        // 5. Build updates array from non-null DTO properties
-        $updates = [];
-        if ($dto->amount !== null) {
-            $updates['amount'] = $dto->amount;
-        }
-        if ($dto->reason !== null) {
-            $updates['reason'] = $dto->reason;
-        }
-        if ($dto->date !== null) {
-            $updates['date'] = $dto->date;
-        }
-        if ($dto->contribution_percentage !== null) {
-            $updates['contribution_percentage'] = $dto->contribution_percentage;
-        }
+        // 5. Execute update
+        $this->incomeRepository->update((int) $id, $dto);
 
-        // 6. Execute update
-        $this->incomeRepository->update((int) $id, $updates);
-
-        // 7. Fetch updated record
+        // 6. Fetch updated record
         $updated = $this->incomeRepository->findById((int) $id);
 
-        // 8. Return updated record
+        // 7. Return updated record
         $this->json($updated);
     }
 

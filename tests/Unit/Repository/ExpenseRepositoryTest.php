@@ -2,7 +2,10 @@
 
 namespace Tests\Unit\Repository;
 
+use App\Dto\ExpenseCreateDto;
+use App\Dto\ExpenseUpdateDto;
 use App\Repository\ExpenseRepository;
+use flight\net\Request;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Tests\Support\DatabaseSeeder;
@@ -46,7 +49,15 @@ class ExpenseRepositoryTest extends TestCase
 
     public function testCreateReturnsExpenseId(): void
     {
-        $expenseId = $this->repository->create($this->memberId, '2025-02-14', 'Utilities', 200.75);
+        $request = new Request();
+        $request->data->setData([
+            'amount' => 200.75,
+            'reason' => 'Utilities',
+            'date' => '2025-02-14'
+        ]);
+        $dto = ExpenseCreateDto::createFromRequest($request);
+
+        $expenseId = $this->repository->create($this->memberId, $dto);
 
         $this->assertIsInt($expenseId);
         $this->assertGreaterThan(0, $expenseId);
@@ -63,10 +74,14 @@ class ExpenseRepositoryTest extends TestCase
     {
         $expenseId = DatabaseSeeder::seedExpense($this->db, $this->memberId, '2025-02-14', 'Groceries', 500.00);
 
-        $result = $this->repository->update($expenseId, [
+        $request = new Request();
+        $request->data->setData([
             'reason' => 'Updated Groceries',
             'amount' => 600.00,
         ]);
+        $dto = ExpenseUpdateDto::createFromRequest($request);
+
+        $result = $this->repository->update($expenseId, $dto);
 
         $this->assertTrue($result);
 
@@ -79,7 +94,11 @@ class ExpenseRepositoryTest extends TestCase
     {
         $expenseId = DatabaseSeeder::seedExpense($this->db, $this->memberId, '2025-02-14', 'Groceries', 500.00);
 
-        $result = $this->repository->update($expenseId, []);
+        $request = new Request();
+        $request->data->setData([]);
+        $dto = ExpenseUpdateDto::createFromRequest($request);
+
+        $result = $this->repository->update($expenseId, $dto);
 
         $this->assertTrue($result);
     }

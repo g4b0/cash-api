@@ -2,7 +2,10 @@
 
 namespace Tests\Unit\Repository;
 
+use App\Dto\IncomeCreateDto;
+use App\Dto\IncomeUpdateDto;
 use App\Repository\IncomeRepository;
+use flight\net\Request;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Tests\Support\DatabaseSeeder;
@@ -47,7 +50,15 @@ class IncomeRepositoryTest extends TestCase
 
     public function testCreateReturnsIncomeId(): void
     {
-        $incomeId = $this->repository->create($this->memberId, '2025-02-14', 'Bonus', 500.50, 80);
+        $request = new Request();
+        $request->data->setData([
+            'amount' => 500.50,
+            'reason' => 'Bonus',
+            'date' => '2025-02-14'
+        ]);
+        $dto = IncomeCreateDto::createFromRequest($request);
+
+        $incomeId = $this->repository->create($this->memberId, $dto, 80);
 
         $this->assertIsInt($incomeId);
         $this->assertGreaterThan(0, $incomeId);
@@ -65,11 +76,15 @@ class IncomeRepositoryTest extends TestCase
     {
         $incomeId = DatabaseSeeder::seedIncome($this->db, $this->memberId, '2025-02-14', 'Salary', 1000.00, 75);
 
-        $result = $this->repository->update($incomeId, [
+        $request = new Request();
+        $request->data->setData([
             'reason' => 'Updated Salary',
             'amount' => 1500.00,
             'contribution_percentage' => 85,
         ]);
+        $dto = IncomeUpdateDto::createFromRequest($request);
+
+        $result = $this->repository->update($incomeId, $dto);
 
         $this->assertTrue($result);
 
@@ -83,7 +98,11 @@ class IncomeRepositoryTest extends TestCase
     {
         $incomeId = DatabaseSeeder::seedIncome($this->db, $this->memberId, '2025-02-14', 'Salary', 1000.00, 75);
 
-        $result = $this->repository->update($incomeId, []);
+        $request = new Request();
+        $request->data->setData([]);
+        $dto = IncomeUpdateDto::createFromRequest($request);
+
+        $result = $this->repository->update($incomeId, $dto);
 
         $this->assertTrue($result);
     }
