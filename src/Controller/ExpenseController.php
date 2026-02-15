@@ -11,14 +11,12 @@ use flight\Engine;
 
 class ExpenseController extends Controller
 {
-    private Validator $validator;
     private MemberRepository $memberRepository;
     private ExpenseRepository $expenseRepository;
 
     public function __construct(Engine $app)
     {
         parent::__construct($app);
-        $this->validator = new Validator();
         $this->memberRepository = new MemberRepository($this->getDb());
         $this->expenseRepository = new ExpenseRepository($this->getDb());
     }

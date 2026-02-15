@@ -11,14 +11,12 @@ use flight\Engine;
 
 class IncomeController extends Controller
 {
-    private Validator $validator;
     private MemberRepository $memberRepository;
     private IncomeRepository $incomeRepository;
 
     public function __construct(Engine $app)
     {
         parent::__construct($app);
-        $this->validator = new Validator();
         $this->memberRepository = new MemberRepository($this->getDb());
         $this->incomeRepository = new IncomeRepository($this->getDb());
     }
