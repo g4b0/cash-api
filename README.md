@@ -9,7 +9,7 @@ A backend REST API for managing shared finances in small communities (e.g., fami
 - **JWT Authentication**: Secure login with access and refresh tokens
 - **Income & Expense Management**: Full CRUD operations for income and expense records
 - **Progressive Contribution**: Contribution percentage scales with income relative to median
-- **Member Dashboard**: View balance (contributions minus expenses)
+- **Balance**: View member balance (contributions minus expenses)
 - **Transactions List**: Paginated list of merged income/expense transactions, sorted by date
 - **Input Validation**: Centralized validator with comprehensive error handling
 - **REST API**: JSON responses, built with Flight PHP v3
@@ -85,7 +85,7 @@ Response:
 }
 ```
 
-### Dashboard (Authenticated)
+### Balance (Authenticated)
 
 | Method | Endpoint | Description | Authorization |
 |--------|----------|-------------|---------------|
@@ -295,7 +295,7 @@ cash/
 │   └── cash.db            # SQLite database (created after init)
 ├── src/
 │   ├── Command/           # CLI command classes
-│   ├── Controller/        # HTTP controllers (Auth, Dashboard, Income, Expense, Transactions)
+│   ├── Controller/        # HTTP controllers (Auth, Income, Expense, Transactions)
 │   ├── Dto/               # Data Transfer Objects for input validation
 │   ├── Exception/         # Custom exceptions (AppException)
 │   ├── Middleware/        # JWT auth & exception handling

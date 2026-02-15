@@ -309,7 +309,7 @@ $this->json(new ExpenseResponse($expense));
 - `CreatedResourceResponse` - POST endpoints (201 + Location header + resource ID)
 - `NoContentResponse` - DELETE endpoints (204 + empty body)
 - `TokenPairResponse` - Auth endpoints (200 + access/refresh tokens)
-- `MetricResponse` - Dashboard endpoints (200 + named metric)
+- `MetricResponse` - Balance endpoint (200 + named metric)
 - `PaginatedResponse` - List endpoints (200 + data + pagination metadata)
 - `MoneyFlowResponse` - Abstract base for income/expense responses
 - `IncomeResponse` - GET/PUT `/income/@id` endpoints

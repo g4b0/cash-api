@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use flight\Engine;
 use Tests\Support\DatabaseSeeder;
 
-class DashboardRouteTest extends TestCase
+class BalanceRouteTest extends TestCase
 {
     private Engine $app;
     private PDO $db;

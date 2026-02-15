@@ -8,6 +8,8 @@ use App\Repository\TransactionRepository;
 use App\Response\TransactionListResponse;
 use App\Response\IncomeResponse;
 use App\Response\ExpenseResponse;
+use App\Response\MetricResponse;
+use App\Service\BalanceCalculator;
 use App\Validation\Validator;
 use flight\Engine;
 
@@ -84,5 +86,30 @@ class TransactionsController extends Controller
         }
 
         $this->json($response);
+    }
+
+    public function balance(string $community_id, string $member_id): void
+    {
+        // Get authenticated user
+        $authUser = $this->getAuthUser();
+        $authCommunityId = (int) $authUser->cid;
+
+        // Verify requested member exists and belongs to a community
+        $memberCommunityId = $this->memberRepository->getCommunityId((int) $member_id);
+
+        if ($memberCommunityId === null) {
+            throw AppException::MEMBER_NOT_FOUND();
+        }
+
+        // Verify auth user is from the same community as requested member
+        if ($memberCommunityId !== $authCommunityId) {
+            throw AppException::FORBIDDEN();
+        }
+
+        // Calculate and return balance
+        $calculator = new BalanceCalculator($this->getDb());
+        $balance = $calculator->calculate((int) $member_id);
+
+        $this->json(new MetricResponse('balance', $balance));
     }
 }
