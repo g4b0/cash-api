@@ -23,17 +23,17 @@ class IncomeRepository extends Repository
     /**
      * Create a new income record.
      *
-     * @param int $ownerId Member ID who owns this income
+     * @param int $memberId Member ID who owns this income
      * @param IncomeDto $dto Validated income data
      * @param int $contributionPercentage Contribution percentage (from DTO or member's default)
      * @return int The ID of the created income record
      */
-    public function create(int $ownerId, IncomeDto $dto, int $contributionPercentage): int
+    public function create(int $memberId, IncomeDto $dto, int $contributionPercentage): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO income (ownerId, date, reason, amount, contributionPercentage) VALUES (?, ?, ?, ?, ?)'
+            'INSERT INTO income (memberId, date, reason, amount, contributionPercentage) VALUES (?, ?, ?, ?, ?)'
         );
-        $stmt->execute([$ownerId, $dto->date, $dto->reason, $dto->amount, $contributionPercentage]);
+        $stmt->execute([$memberId, $dto->date, $dto->reason, $dto->amount, $contributionPercentage]);
 
         return (int) $this->db->lastInsertId();
     }
@@ -74,7 +74,7 @@ class IncomeRepository extends Repository
     public function calculateTotalContributions(int $memberId): float
     {
         $stmt = $this->db->prepare(
-            'SELECT COALESCE(SUM(amount * contributionPercentage / 100.0), 0) FROM income WHERE ownerId = ?'
+            'SELECT COALESCE(SUM(amount * contributionPercentage / 100.0), 0) FROM income WHERE memberId = ?'
         );
         $stmt->execute([$memberId]);
         return (float) $stmt->fetchColumn();

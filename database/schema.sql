@@ -31,34 +31,34 @@ CREATE TABLE member
 CREATE TABLE income
 (
     id                     INTEGER PRIMARY KEY AUTOINCREMENT,
-    ownerId                INTEGER       NOT NULL,
+    memberId               INTEGER       NOT NULL,
     date                   DATE          NOT NULL,
     reason                 TEXT          NOT NULL,
     amount                 DECIMAL(10,2) NOT NULL,
     contributionPercentage INTEGER       NOT NULL,
     createdAt              DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updatedAt              DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (ownerId) REFERENCES member (id)
+    FOREIGN KEY (memberId) REFERENCES member (id)
 );
 
 -- Expense: costs incurred by a member
 CREATE TABLE expense
 (
     id        INTEGER PRIMARY KEY AUTOINCREMENT,
-    ownerId   INTEGER       NOT NULL,
+    memberId  INTEGER       NOT NULL,
     date      DATE          NOT NULL,
     reason    TEXT          NOT NULL,
     amount    DECIMAL(10,2) NOT NULL,
     createdAt DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (ownerId) REFERENCES member (id)
+    FOREIGN KEY (memberId) REFERENCES member (id)
 );
 
 -- Indexes
 CREATE INDEX idx_member_communityId ON member (communityId);
-CREATE INDEX idx_income_ownerId ON income (ownerId);
+CREATE INDEX idx_income_memberId ON income (memberId);
 CREATE INDEX idx_income_date ON income (date);
-CREATE INDEX idx_expense_ownerId ON expense (ownerId);
+CREATE INDEX idx_expense_memberId ON expense (memberId);
 CREATE INDEX idx_expense_date ON expense (date);
 
 -- Triggers: auto-update updatedAt on row modification

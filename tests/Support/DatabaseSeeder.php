@@ -49,18 +49,18 @@ class DatabaseSeeder
 
     public static function seedIncome(
         PDO $db,
-        int $ownerId,
+        int $memberId,
         string $date,
         string $reason,
         float $amount,
         int $contributionPercentage
     ): int {
         $stmt = $db->prepare(
-            'INSERT INTO income (ownerId, date, reason, amount, contributionPercentage)
-             VALUES (:ownerId, :date, :reason, :amount, :contributionPercentage)'
+            'INSERT INTO income (memberId, date, reason, amount, contributionPercentage)
+             VALUES (:memberId, :date, :reason, :amount, :contributionPercentage)'
         );
         $stmt->execute([
-            'ownerId' => $ownerId,
+            'memberId' => $memberId,
             'date' => $date,
             'reason' => $reason,
             'amount' => $amount,
@@ -72,17 +72,17 @@ class DatabaseSeeder
 
     public static function seedExpense(
         PDO $db,
-        int $ownerId,
+        int $memberId,
         string $date,
         string $reason,
         float $amount
     ): int {
         $stmt = $db->prepare(
-            'INSERT INTO expense (ownerId, date, reason, amount)
-             VALUES (:ownerId, :date, :reason, :amount)'
+            'INSERT INTO expense (memberId, date, reason, amount)
+             VALUES (:memberId, :date, :reason, :amount)'
         );
         $stmt->execute([
-            'ownerId' => $ownerId,
+            'memberId' => $memberId,
             'date' => $date,
             'reason' => $reason,
             'amount' => $amount,

@@ -23,16 +23,16 @@ class ExpenseRepository extends Repository
     /**
      * Create a new expense record.
      *
-     * @param int $ownerId Member ID who owns this expense
+     * @param int $memberId Member ID who owns this expense
      * @param ExpenseDto $dto Validated expense data
      * @return int The ID of the created expense record
      */
-    public function create(int $ownerId, ExpenseDto $dto): int
+    public function create(int $memberId, ExpenseDto $dto): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO expense (ownerId, date, reason, amount) VALUES (?, ?, ?, ?)'
+            'INSERT INTO expense (memberId, date, reason, amount) VALUES (?, ?, ?, ?)'
         );
-        $stmt->execute([$ownerId, $dto->date, $dto->reason, $dto->amount]);
+        $stmt->execute([$memberId, $dto->date, $dto->reason, $dto->amount]);
 
         return (int) $this->db->lastInsertId();
     }
@@ -71,7 +71,7 @@ class ExpenseRepository extends Repository
     public function calculateTotalExpenses(int $memberId): float
     {
         $stmt = $this->db->prepare(
-            'SELECT COALESCE(SUM(amount), 0) FROM expense WHERE ownerId = ?'
+            'SELECT COALESCE(SUM(amount), 0) FROM expense WHERE memberId = ?'
         );
         $stmt->execute([$memberId]);
         return (float) $stmt->fetchColumn();

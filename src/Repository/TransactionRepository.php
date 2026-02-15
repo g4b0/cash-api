@@ -14,9 +14,9 @@ class TransactionRepository extends Repository
     {
         $stmt = $this->db->prepare('
             SELECT COUNT(*) FROM (
-                SELECT id FROM income WHERE ownerId = ?
+                SELECT id FROM income WHERE memberId = ?
                 UNION ALL
-                SELECT id FROM expense WHERE ownerId = ?
+                SELECT id FROM expense WHERE memberId = ?
             )
         ');
         $stmt->execute([$memberId, $memberId]);
@@ -35,7 +35,7 @@ class TransactionRepository extends Repository
             SELECT * FROM (
                 SELECT
                     id,
-                    ownerId,
+                    memberId,
                     "income" as type,
                     date,
                     reason,
@@ -43,13 +43,13 @@ class TransactionRepository extends Repository
                     contributionPercentage,
                     createdAt,
                     updatedAt
-                FROM income WHERE ownerId = ?
+                FROM income WHERE memberId = ?
 
                 UNION ALL
 
                 SELECT
                     id,
-                    ownerId,
+                    memberId,
                     "expense" as type,
                     date,
                     reason,
@@ -57,7 +57,7 @@ class TransactionRepository extends Repository
                     NULL as contributionPercentage,
                     createdAt,
                     updatedAt
-                FROM expense WHERE ownerId = ?
+                FROM expense WHERE memberId = ?
             )
             ORDER BY date DESC
             LIMIT ? OFFSET ?

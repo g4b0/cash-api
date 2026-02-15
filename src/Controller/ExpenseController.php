@@ -27,11 +27,11 @@ class ExpenseController extends Controller
     {
         // 1. Get authenticated user
         $authUser = $this->getAuthUser();
-        $ownerId = (int) $authUser->sub;
+        $memberId = (int) $authUser->sub;
         $communityId = (int) $authUser->cid;
 
         // 2. Verify member exists and belongs to community
-        $member = $this->memberRepository->findByIdInCommunity($ownerId, $communityId);
+        $member = $this->memberRepository->findByIdInCommunity($memberId, $communityId);
 
         if (!$member) {
             throw AppException::FORBIDDEN();
@@ -41,7 +41,7 @@ class ExpenseController extends Controller
         $dto = ExpenseDto::createFromRequest($this->app->request());
 
         // 4. Create expense record
-        $expenseId = $this->expenseRepository->create($ownerId, $dto);
+        $expenseId = $this->expenseRepository->create($memberId, $dto);
 
         // 5. Return 201 Created with resource identifier (Location header set automatically)
         $this->json(new CreatedResourceResponse($expenseId, 'expense'));
@@ -61,7 +61,7 @@ class ExpenseController extends Controller
         }
 
         // 3. Verify community access (fetch owner's community)
-        $ownerCommunityId = $this->memberRepository->getCommunityId((int) $expense['ownerId']);
+        $ownerCommunityId = $this->memberRepository->getCommunityId((int) $expense['memberId']);
 
         if ($ownerCommunityId !== $communityId) {
             throw AppException::FORBIDDEN();
@@ -85,7 +85,7 @@ class ExpenseController extends Controller
         }
 
         // 3. Verify ownership
-        if ((int) $expense['ownerId'] !== $memberId) {
+        if ((int) $expense['memberId'] !== $memberId) {
             throw AppException::FORBIDDEN();
         }
 
@@ -116,7 +116,7 @@ class ExpenseController extends Controller
         }
 
         // 3. Verify ownership
-        if ((int) $expense['ownerId'] !== $memberId) {
+        if ((int) $expense['memberId'] !== $memberId) {
             throw AppException::FORBIDDEN();
         }
 

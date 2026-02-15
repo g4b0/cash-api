@@ -33,7 +33,7 @@ class IncomeRepositoryTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertEquals($incomeId, $result['id']);
-        $this->assertEquals($this->memberId, $result['ownerId']);
+        $this->assertEquals($this->memberId, $result['memberId']);
         $this->assertEquals('2025-02-14', $result['date']);
         $this->assertEquals('Salary', $result['reason']);
         $this->assertEquals('1000', $result['amount']);
@@ -65,7 +65,7 @@ class IncomeRepositoryTest extends TestCase
         // Verify it was actually created
         $income = $this->repository->findById($incomeId);
         $this->assertNotNull($income);
-        $this->assertEquals($this->memberId, $income['ownerId']);
+        $this->assertEquals($this->memberId, $income['memberId']);
         $this->assertEquals('Bonus', $income['reason']);
         $this->assertEquals('500.5', $income['amount']);
         $this->assertEquals(80, $income['contributionPercentage']);

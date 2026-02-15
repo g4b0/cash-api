@@ -92,10 +92,10 @@ Repositories receive validated DTOs instead of individual parameters:
 
 ```php
 // Create method signature
-public function create(int $ownerId, IncomeCreateDto $dto, int $contributionPercentage): int
+public function create(int $memberId, IncomeDto $dto, int $contributionPercentage): int
 {
-    $stmt = $this->db->prepare('INSERT INTO income (owner_id, date, reason, amount, contribution_percentage) VALUES (?, ?, ?, ?, ?)');
-    $stmt->execute([$ownerId, $dto->date, $dto->reason, $dto->amount, $contributionPercentage]);
+    $stmt = $this->db->prepare('INSERT INTO income (memberId, date, reason, amount, contributionPercentage) VALUES (?, ?, ?, ?, ?)');
+    $stmt->execute([$memberId, $dto->date, $dto->reason, $dto->amount, $contributionPercentage]);
     return (int) $this->db->lastInsertId();
 }
 

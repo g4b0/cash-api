@@ -27,11 +27,11 @@ class IncomeController extends Controller
     {
         // 1. Get authenticated user
         $authUser = $this->getAuthUser();
-        $ownerId = (int) $authUser->sub;
+        $memberId = (int) $authUser->sub;
         $communityId = (int) $authUser->cid;
 
         // 2. Verify member exists and belongs to community
-        $member = $this->memberRepository->findByIdInCommunity($ownerId, $communityId);
+        $member = $this->memberRepository->findByIdInCommunity($memberId, $communityId);
 
         if (!$member) {
             throw AppException::FORBIDDEN();
@@ -44,7 +44,7 @@ class IncomeController extends Controller
         $contributionPercentage = $dto->contributionPercentage ?? (int) $member['contributionPercentage'];
 
         // 5. Create income record
-        $incomeId = $this->incomeRepository->create($ownerId, $dto, $contributionPercentage);
+        $incomeId = $this->incomeRepository->create($memberId, $dto, $contributionPercentage);
 
         // 6. Return 201 Created with resource identifier (Location header set automatically)
         $this->json(new CreatedResourceResponse($incomeId, 'income'));
@@ -64,7 +64,7 @@ class IncomeController extends Controller
         }
 
         // 3. Verify community access (fetch owner's community)
-        $ownerCommunityId = $this->memberRepository->getCommunityId((int) $income['ownerId']);
+        $ownerCommunityId = $this->memberRepository->getCommunityId((int) $income['memberId']);
 
         if ($ownerCommunityId !== $communityId) {
             throw AppException::FORBIDDEN();
@@ -88,7 +88,7 @@ class IncomeController extends Controller
         }
 
         // 3. Verify ownership
-        if ((int) $income['ownerId'] !== $memberId) {
+        if ((int) $income['memberId'] !== $memberId) {
             throw AppException::FORBIDDEN();
         }
 
@@ -122,7 +122,7 @@ class IncomeController extends Controller
         }
 
         // 3. Verify ownership
-        if ((int) $income['ownerId'] !== $memberId) {
+        if ((int) $income['memberId'] !== $memberId) {
             throw AppException::FORBIDDEN();
         }
 
