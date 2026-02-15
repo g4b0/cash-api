@@ -7,9 +7,8 @@ use App\Exception\AppException;
 use App\Repository\IncomeRepository;
 use App\Repository\MemberRepository;
 use App\Response\CreatedResourceResponse;
-use App\Response\EntityResponse;
+use App\Response\IncomeResponse;
 use App\Response\NoContentResponse;
-use App\Validation\Validator;
 use flight\Engine;
 
 class IncomeController extends Controller
@@ -72,7 +71,7 @@ class IncomeController extends Controller
         }
 
         // 4. Return record
-        $this->json(new EntityResponse($income));
+        $this->json(new IncomeResponse($income));
     }
 
     public function update(string $id): void
@@ -106,7 +105,7 @@ class IncomeController extends Controller
         $updated = $this->incomeRepository->findById((int) $id);
 
         // 8. Return updated record
-        $this->json(new EntityResponse($updated));
+        $this->json(new IncomeResponse($updated));
     }
 
     public function delete(string $id): void

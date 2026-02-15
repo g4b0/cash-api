@@ -7,9 +7,8 @@ use App\Exception\AppException;
 use App\Repository\ExpenseRepository;
 use App\Repository\MemberRepository;
 use App\Response\CreatedResourceResponse;
-use App\Response\EntityResponse;
+use App\Response\ExpenseResponse;
 use App\Response\NoContentResponse;
-use App\Validation\Validator;
 use flight\Engine;
 
 class ExpenseController extends Controller
@@ -69,7 +68,7 @@ class ExpenseController extends Controller
         }
 
         // 4. Return record
-        $this->json(new EntityResponse($expense));
+        $this->json(new ExpenseResponse($expense));
     }
 
     public function update(string $id): void
@@ -100,7 +99,7 @@ class ExpenseController extends Controller
         $updated = $this->expenseRepository->findById((int) $id);
 
         // 7. Return updated record
-        $this->json(new EntityResponse($updated));
+        $this->json(new ExpenseResponse($updated));
     }
 
     public function delete(string $id): void
