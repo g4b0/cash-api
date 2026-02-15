@@ -309,13 +309,14 @@ $this->json(new ExpenseResponse($expense));
 - `CreatedResourceResponse` - POST endpoints (201 + Location header + resource ID)
 - `NoContentResponse` - DELETE endpoints (204 + empty body)
 - `TokenPairResponse` - Auth endpoints (200 + access/refresh tokens)
-- `MetricResponse` - Balance endpoint (200 + named metric)
-- `PaginatedResponse` - List endpoints (200 + data + pagination metadata)
+- `BalanceResponse` - Balance endpoint (200 + memberId + balance as string for precision)
+- `TransactionListResponse` - Transactions list (200 + transactions array + pagination)
+- `Pagination` - Pagination metadata (composable, used by TransactionListResponse)
 - `MoneyFlowResponse` - Abstract base for income/expense responses
-- `IncomeResponse` - GET/PUT `/income/@id` endpoints
-- `ExpenseResponse` - GET/PUT `/expense/@id` endpoints
+- `IncomeResponse` - GET/PUT `/income/@id` endpoints (extends MoneyFlowResponse, adds type and contributionPercentage)
+- `ExpenseResponse` - GET/PUT `/expense/@id` endpoints (extends MoneyFlowResponse, adds type field)
 
-**Note**: Response classes are tested indirectly via Feature tests (testing actual HTTP responses), not via dedicated Unit tests, since they are primarily data structures without complex logic.
+**Note**: Response classes have unit tests in `tests/Unit/Response/ResponseTest.php` and are also tested indirectly via Feature tests (testing actual HTTP responses).
 
 ## Development Principles
 

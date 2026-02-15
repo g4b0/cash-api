@@ -8,7 +8,7 @@ use App\Repository\TransactionRepository;
 use App\Response\TransactionListResponse;
 use App\Response\IncomeResponse;
 use App\Response\ExpenseResponse;
-use App\Response\MetricResponse;
+use App\Response\BalanceResponse;
 use App\Service\BalanceCalculator;
 use App\Validation\Validator;
 use flight\Engine;
@@ -110,6 +110,6 @@ class TransactionsController extends Controller
         $calculator = new BalanceCalculator($this->getDb());
         $balance = $calculator->calculate((int) $member_id);
 
-        $this->json(new MetricResponse('balance', $balance));
+        $this->json(new BalanceResponse((int) $member_id, $balance));
     }
 }

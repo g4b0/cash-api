@@ -86,7 +86,8 @@ class BalanceRouteTest extends TestCase
         $this->assertEquals(200, $this->app->response()->status());
 
         $body = json_decode($this->app->response()->getBody(), true);
-        $this->assertEquals(0, $body['balance']);
+        $this->assertEquals($memberId, $body['memberId']);
+        $this->assertEquals('0', $body['balance']);
     }
 
     public function testBalanceReturnsCorrectBalance(): void
@@ -113,7 +114,8 @@ class BalanceRouteTest extends TestCase
         $this->assertEquals(200, $this->app->response()->status());
 
         $body = json_decode($this->app->response()->getBody(), true);
-        $this->assertEquals(625, $body['balance']);
+        $this->assertEquals($memberId, $body['memberId']);
+        $this->assertEquals('625', $body['balance']);
     }
 
     public function testBalanceForMemberInSameCommunityReturns200(): void
@@ -133,7 +135,9 @@ class BalanceRouteTest extends TestCase
         $this->assertEquals(200, $this->app->response()->status());
 
         $body = json_decode($this->app->response()->getBody(), true);
+        $this->assertArrayHasKey('memberId', $body);
         $this->assertArrayHasKey('balance', $body);
+        $this->assertEquals($member2Id, $body['memberId']);
     }
 
     public function testBalanceForMemberInDifferentCommunityReturns403(): void

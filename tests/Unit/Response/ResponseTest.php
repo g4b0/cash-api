@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Response;
 
+use App\Response\BalanceResponse;
 use App\Response\CreatedResourceResponse;
-use App\Response\MetricResponse;
 use App\Response\NoContentResponse;
 use App\Response\TokenPairResponse;
 use PHPUnit\Framework\TestCase;
@@ -59,20 +59,26 @@ class ResponseTest extends TestCase
         $this->assertNull($response->getLocationHeader());
     }
 
-    public function testMetricResponseReturnsNamedMetric(): void
+    public function testBalanceResponseReturnsBalance(): void
     {
-        $response = new MetricResponse('balance', 1250.50);
+        $response = new BalanceResponse(1, 1250.50);
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(['balance' => 1250.50], $response->toArray());
+        $this->assertEquals([
+            'memberId' => 1,
+            'balance' => '1250.5',
+        ], $response->toArray());
         $this->assertNull($response->getLocationHeader());
     }
 
-    public function testMetricResponseSupportsIntegerValues(): void
+    public function testBalanceResponsePreservesDecimalPrecision(): void
     {
-        $response = new MetricResponse('count', 42);
+        // Float with many decimals - string preserves precision
+        $response = new BalanceResponse(2, 625.123456789);
 
-        $this->assertEquals(['count' => 42], $response->toArray());
+        $array = $response->toArray();
+        $this->assertIsString($array['balance']);
+        $this->assertEquals('625.123456789', $array['balance']);
     }
 
     public function testJsonSerializableInterfaceWorks(): void
@@ -82,7 +88,7 @@ class ResponseTest extends TestCase
             new CreatedResourceResponse(1, 'test'),
             new NoContentResponse(),
             new TokenPairResponse('access', 'refresh'),
-            new MetricResponse('metric', 123),
+            new BalanceResponse(1, 123.45),
         ];
 
         foreach ($responses as $response) {
