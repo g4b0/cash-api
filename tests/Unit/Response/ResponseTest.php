@@ -5,7 +5,6 @@ namespace Tests\Unit\Response;
 use App\Response\CreatedResourceResponse;
 use App\Response\MetricResponse;
 use App\Response\NoContentResponse;
-use App\Response\PaginatedResponse;
 use App\Response\TokenPairResponse;
 use PHPUnit\Framework\TestCase;
 
@@ -76,38 +75,6 @@ class ResponseTest extends TestCase
         $this->assertEquals(['count' => 42], $response->toArray());
     }
 
-    public function testPaginatedResponseReturnsPaginationMetadata(): void
-    {
-        $data = [
-            ['id' => 1, 'amount' => 100],
-            ['id' => 2, 'amount' => 200],
-        ];
-
-        $response = new PaginatedResponse($data, 2, 5, 120, 25);
-
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $result = $response->toArray();
-        $this->assertEquals($data, $result['data']);
-        $this->assertEquals([
-            'current_page' => 2,
-            'total_pages' => 5,
-            'total_items' => 120,
-            'per_page' => 25,
-        ], $result['pagination']);
-
-        $this->assertNull($response->getLocationHeader());
-    }
-
-    public function testPaginatedResponseWithEmptyData(): void
-    {
-        $response = new PaginatedResponse([], 1, 0, 0, 25);
-
-        $result = $response->toArray();
-        $this->assertEquals([], $result['data']);
-        $this->assertEquals(0, $result['pagination']['total_items']);
-    }
-
     public function testJsonSerializableInterfaceWorks(): void
     {
         // Test that all response classes implement JsonSerializable correctly
@@ -116,7 +83,6 @@ class ResponseTest extends TestCase
             new NoContentResponse(),
             new TokenPairResponse('access', 'refresh'),
             new MetricResponse('metric', 123),
-            new PaginatedResponse([], 1, 1, 0, 25),
         ];
 
         foreach ($responses as $response) {

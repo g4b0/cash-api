@@ -35,6 +35,7 @@ class TransactionRepository extends Repository
             SELECT * FROM (
                 SELECT
                     id,
+                    owner_id,
                     "income" as type,
                     date,
                     reason,
@@ -48,6 +49,7 @@ class TransactionRepository extends Repository
 
                 SELECT
                     id,
+                    owner_id,
                     "expense" as type,
                     date,
                     reason,

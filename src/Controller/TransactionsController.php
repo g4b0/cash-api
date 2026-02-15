@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Exception\AppException;
 use App\Repository\MemberRepository;
 use App\Repository\TransactionRepository;
-use App\Response\PaginatedResponse;
+use App\Response\TransactionListResponse;
+use App\Response\IncomeResponse;
+use App\Response\ExpenseResponse;
 use App\Validation\Validator;
 use flight\Engine;
 
@@ -65,13 +67,22 @@ class TransactionsController extends Controller
             $offset
         );
 
-        // Return response with data and pagination metadata
-        $this->json(new PaginatedResponse(
-            $transactions,
+        // Create response and add typed transaction responses
+        $response = new TransactionListResponse(
             $currentPage,
             $totalPages,
             $totalItems,
             $perPage
-        ));
+        );
+
+        foreach ($transactions as $transaction) {
+            if ($transaction['type'] === 'income') {
+                $response->pushIncome(new IncomeResponse($transaction));
+            } else {
+                $response->pushExpense(new ExpenseResponse($transaction));
+            }
+        }
+
+        $this->json($response);
     }
 }

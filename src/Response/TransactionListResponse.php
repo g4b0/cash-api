@@ -5,12 +5,12 @@ namespace App\Response;
 /**
  * Composable response for transaction lists.
  *
- * Combines an array of transaction responses (Income/Expense) with pagination metadata.
+ * Combines typed transaction responses (Income/Expense) with pagination metadata.
  *
  * Example:
- *   $response = new TransactionListResponse();
- *   $response->transactions = [$incomeResponse, $expenseResponse];
- *   $response->pagination = new Pagination(1, 5, 120, 25);
+ *   $response = new TransactionListResponse(1, 5, 120, 25);
+ *   $response->pushIncome(new IncomeResponse($incomeData));
+ *   $response->pushExpense(new ExpenseResponse($expenseData));
  *
  * Results in:
  *   {
@@ -29,8 +29,43 @@ namespace App\Response;
 class TransactionListResponse extends AppResponse
 {
     /** @var array<IncomeResponse|ExpenseResponse> Transaction response objects */
-    public array $transactions;
+    public array $transactions = [];
 
     /** @var Pagination Pagination metadata */
     public Pagination $pagination;
+
+    /**
+     * @param int $currentPage Current page number
+     * @param int $totalPages Total number of pages
+     * @param int $totalItems Total number of items across all pages
+     * @param int $perPage Items per page
+     */
+    public function __construct(
+        int $currentPage,
+        int $totalPages,
+        int $totalItems,
+        int $perPage
+    ) {
+        $this->pagination = new Pagination($currentPage, $totalPages, $totalItems, $perPage);
+    }
+
+    /**
+     * Add an income transaction to the list.
+     *
+     * @param IncomeResponse $income Income transaction response
+     */
+    public function pushIncome(IncomeResponse $income): void
+    {
+        $this->transactions[] = $income;
+    }
+
+    /**
+     * Add an expense transaction to the list.
+     *
+     * @param ExpenseResponse $expense Expense transaction response
+     */
+    public function pushExpense(ExpenseResponse $expense): void
+    {
+        $this->transactions[] = $expense;
+    }
 }
