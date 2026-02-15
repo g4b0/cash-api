@@ -119,17 +119,17 @@ public function update(int $id, IncomeUpdateDto $dto): bool
 
 ### DTO Pattern
 
-Input validation for POST/PUT/PATCH endpoints uses Data Transfer Objects (DTOs).
+Input validation for POST/PUT endpoints uses Data Transfer Objects (DTOs).
 
 **Location**: `src/Dto/`
 
-**Naming**: `{Entity}{Operation}Dto` (e.g., `IncomeCreateDto`, `ExpenseUpdateDto`)
+**Naming**: `{Entity}Dto` (e.g., `IncomeDto`, `ExpenseDto`)
 
-**Create DTOs (POST)** — Required fields:
+**Unified DTOs** — Single DTO per entity, used for both POST and PUT:
 ```php
-class IncomeCreateDto extends Dto
+class IncomeDto extends Dto
 {
-    public float $amount;           // Type-hinted properties
+    public float $amount;           // Type-hinted properties (all required)
     public string $reason;
     public string $date;
     public ?int $contribution_percentage;
@@ -137,22 +137,7 @@ class IncomeCreateDto extends Dto
     public static function createFromRequest(Request $request): self
     {
         // Extract data, validate, return DTO instance
-    }
-}
-```
-
-**Update DTOs (PATCH)** — All fields optional (nullable):
-```php
-class IncomeUpdateDto extends Dto
-{
-    public ?float $amount = null;
-    public ?string $reason = null;
-    public ?string $date = null;
-    public ?int $contribution_percentage = null;
-
-    public static function createFromRequest(Request $request): self
-    {
-        // Validate only provided fields, leave others null
+        // All fields mandatory except contribution_percentage
     }
 }
 ```
@@ -161,31 +146,36 @@ class IncomeUpdateDto extends Dto
 
 *Create (POST):*
 ```php
-$dto = IncomeCreateDto::createFromRequest($this->app->request());
+$dto = IncomeDto::createFromRequest($this->app->request());
 // Use $dto->amount, $dto->reason, etc. (type-safe, validated)
+$contributionPercentage = $dto->contribution_percentage ?? $member['contribution_percentage'];
+$incomeId = $this->incomeRepository->create($ownerId, $dto, $contributionPercentage);
 ```
 
-*Update (PATCH):*
+*Update (PUT):*
 ```php
-$dto = IncomeUpdateDto::createFromRequest($this->app->request());
-
-// Controller builds updates array from non-null properties
-$updates = [];
-if ($dto->amount !== null) {
-    $updates['amount'] = $dto->amount;
-}
-// ... repeat for other fields
+$dto = IncomeDto::createFromRequest($this->app->request());
+// PUT requires all fields (full replacement, not partial update)
+$contributionPercentage = $dto->contribution_percentage ?? $income['contribution_percentage'];
+$this->incomeRepository->update($id, $dto, $contributionPercentage);
 ```
+
+**HTTP Methods**:
+- **POST** `/income` — Create new income record
+- **PUT** `/income/@id` — Replace entire income record (all fields required)
+- **GET** `/income/@id` — Retrieve income record
+- **DELETE** `/income/@id` — Delete income record
 
 **Responsibility Separation**:
 - **DTOs**: Transport and validate data (no logic)
-- **Controllers**: Handle null checks and build updates array
+- **Controllers**: Handle defaults (e.g., contribution_percentage) and orchestrate
 
 **Benefits**:
 - Type-safe input handling with property type hints
+- Single DTO per entity (simpler, less code duplication)
 - Centralized validation logic in dedicated classes
-- Reduced controller boilerplate
-- POST payloads align with GET response structure
+- PUT semantics (full replacement) are clearer than PATCH (partial update)
+- POST and PUT payloads are identical (except id in route)
 - Clear separation of concerns (DTOs validate, controllers orchestrate)
 
 **Validation**: DTOs delegate to existing `Validator` class methods, maintaining consistency with validation rules and error messages.

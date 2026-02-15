@@ -2,8 +2,7 @@
 
 namespace App\Controller;
 
-use App\Dto\IncomeCreateDto;
-use App\Dto\IncomeUpdateDto;
+use App\Dto\IncomeDto;
 use App\Exception\AppException;
 use App\Repository\IncomeRepository;
 use App\Repository\MemberRepository;
@@ -39,7 +38,7 @@ class IncomeController extends Controller
         }
 
         // 3. Validate input via DTO
-        $dto = IncomeCreateDto::createFromRequest($this->app->request());
+        $dto = IncomeDto::createFromRequest($this->app->request());
 
         // 4. Handle contribution_percentage default
         $contributionPercentage = $dto->contribution_percentage ?? (int) $member['contribution_percentage'];
@@ -97,15 +96,18 @@ class IncomeController extends Controller
         }
 
         // 4. Validate input via DTO
-        $dto = IncomeUpdateDto::createFromRequest($this->app->request());
+        $dto = IncomeDto::createFromRequest($this->app->request());
 
-        // 5. Execute update
-        $this->incomeRepository->update((int) $id, $dto);
+        // 5. Handle contribution_percentage default
+        $contributionPercentage = $dto->contribution_percentage ?? (int) $income['contribution_percentage'];
 
-        // 6. Fetch updated record
+        // 6. Execute update
+        $this->incomeRepository->update((int) $id, $dto, $contributionPercentage);
+
+        // 7. Fetch updated record
         $updated = $this->incomeRepository->findById((int) $id);
 
-        // 7. Return updated record
+        // 8. Return updated record
         $this->json($updated);
     }
 

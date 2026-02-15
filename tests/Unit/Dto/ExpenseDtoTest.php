@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Dto;
 
-use App\Dto\ExpenseCreateDto;
+use App\Dto\ExpenseDto;
 use App\Exception\AppException;
 use flight\net\Request;
 use PHPUnit\Framework\TestCase;
 
-class ExpenseCreateDtoTest extends TestCase
+class ExpenseDtoTest extends TestCase
 {
     private function createRequest(array $data): Request
     {
@@ -24,7 +24,7 @@ class ExpenseCreateDtoTest extends TestCase
             'date' => '2025-02-15'
         ]);
 
-        $dto = ExpenseCreateDto::createFromRequest($request);
+        $dto = ExpenseDto::createFromRequest($request);
 
         $this->assertSame(500.75, $dto->amount);
         $this->assertSame('Groceries', $dto->reason);
@@ -38,7 +38,7 @@ class ExpenseCreateDtoTest extends TestCase
             'reason' => 'Utilities'
         ]);
 
-        $dto = ExpenseCreateDto::createFromRequest($request);
+        $dto = ExpenseDto::createFromRequest($request);
 
         $this->assertSame(100.0, $dto->amount);
         $this->assertSame('Utilities', $dto->reason);
@@ -54,7 +54,7 @@ class ExpenseCreateDtoTest extends TestCase
             'reason' => 'Test'
         ]);
 
-        ExpenseCreateDto::createFromRequest($request);
+        ExpenseDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithZeroAmountThrowsException(): void
@@ -67,7 +67,7 @@ class ExpenseCreateDtoTest extends TestCase
             'reason' => 'Test'
         ]);
 
-        ExpenseCreateDto::createFromRequest($request);
+        ExpenseDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithNegativeAmountThrowsException(): void
@@ -80,7 +80,7 @@ class ExpenseCreateDtoTest extends TestCase
             'reason' => 'Test'
         ]);
 
-        ExpenseCreateDto::createFromRequest($request);
+        ExpenseDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithMissingReasonThrowsException(): void
@@ -92,7 +92,7 @@ class ExpenseCreateDtoTest extends TestCase
             'amount' => 100
         ]);
 
-        ExpenseCreateDto::createFromRequest($request);
+        ExpenseDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithEmptyReasonThrowsException(): void
@@ -105,7 +105,7 @@ class ExpenseCreateDtoTest extends TestCase
             'reason' => '   '
         ]);
 
-        ExpenseCreateDto::createFromRequest($request);
+        ExpenseDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithInvalidDateFormatThrowsException(): void
@@ -119,7 +119,7 @@ class ExpenseCreateDtoTest extends TestCase
             'date' => '15/02/2025'
         ]);
 
-        ExpenseCreateDto::createFromRequest($request);
+        ExpenseDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestTrimsReasonWhitespace(): void
@@ -129,7 +129,7 @@ class ExpenseCreateDtoTest extends TestCase
             'reason' => '  Groceries  '
         ]);
 
-        $dto = ExpenseCreateDto::createFromRequest($request);
+        $dto = ExpenseDto::createFromRequest($request);
 
         $this->assertSame('Groceries', $dto->reason);
     }
@@ -141,7 +141,7 @@ class ExpenseCreateDtoTest extends TestCase
             'reason' => 'Test'
         ]);
 
-        $dto = ExpenseCreateDto::createFromRequest($request);
+        $dto = ExpenseDto::createFromRequest($request);
 
         $this->assertSame(500.0, $dto->amount);
         $this->assertIsFloat($dto->amount);

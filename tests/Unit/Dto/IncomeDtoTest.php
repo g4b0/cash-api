@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Dto;
 
-use App\Dto\IncomeCreateDto;
+use App\Dto\IncomeDto;
 use App\Exception\AppException;
 use flight\net\Request;
 use PHPUnit\Framework\TestCase;
 
-class IncomeCreateDtoTest extends TestCase
+class IncomeDtoTest extends TestCase
 {
     private function createRequest(array $data): Request
     {
@@ -25,7 +25,7 @@ class IncomeCreateDtoTest extends TestCase
             'contribution_percentage' => 75
         ]);
 
-        $dto = IncomeCreateDto::createFromRequest($request);
+        $dto = IncomeDto::createFromRequest($request);
 
         $this->assertSame(1500.50, $dto->amount);
         $this->assertSame('Monthly salary', $dto->reason);
@@ -40,7 +40,7 @@ class IncomeCreateDtoTest extends TestCase
             'reason' => 'Bonus'
         ]);
 
-        $dto = IncomeCreateDto::createFromRequest($request);
+        $dto = IncomeDto::createFromRequest($request);
 
         $this->assertSame(100.0, $dto->amount);
         $this->assertSame('Bonus', $dto->reason);
@@ -57,7 +57,7 @@ class IncomeCreateDtoTest extends TestCase
             'reason' => 'Test'
         ]);
 
-        IncomeCreateDto::createFromRequest($request);
+        IncomeDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithZeroAmountThrowsException(): void
@@ -70,7 +70,7 @@ class IncomeCreateDtoTest extends TestCase
             'reason' => 'Test'
         ]);
 
-        IncomeCreateDto::createFromRequest($request);
+        IncomeDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithNegativeAmountThrowsException(): void
@@ -83,7 +83,7 @@ class IncomeCreateDtoTest extends TestCase
             'reason' => 'Test'
         ]);
 
-        IncomeCreateDto::createFromRequest($request);
+        IncomeDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithMissingReasonThrowsException(): void
@@ -95,7 +95,7 @@ class IncomeCreateDtoTest extends TestCase
             'amount' => 100
         ]);
 
-        IncomeCreateDto::createFromRequest($request);
+        IncomeDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithEmptyReasonThrowsException(): void
@@ -108,7 +108,7 @@ class IncomeCreateDtoTest extends TestCase
             'reason' => '   '
         ]);
 
-        IncomeCreateDto::createFromRequest($request);
+        IncomeDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithInvalidDateFormatThrowsException(): void
@@ -122,7 +122,7 @@ class IncomeCreateDtoTest extends TestCase
             'date' => '15/02/2025'
         ]);
 
-        IncomeCreateDto::createFromRequest($request);
+        IncomeDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestWithInvalidContributionPercentageThrowsException(): void
@@ -136,7 +136,7 @@ class IncomeCreateDtoTest extends TestCase
             'contribution_percentage' => 101
         ]);
 
-        IncomeCreateDto::createFromRequest($request);
+        IncomeDto::createFromRequest($request);
     }
 
     public function testCreateFromRequestTrimsReasonWhitespace(): void
@@ -146,7 +146,7 @@ class IncomeCreateDtoTest extends TestCase
             'reason' => '  Salary  '
         ]);
 
-        $dto = IncomeCreateDto::createFromRequest($request);
+        $dto = IncomeDto::createFromRequest($request);
 
         $this->assertSame('Salary', $dto->reason);
     }
@@ -158,7 +158,7 @@ class IncomeCreateDtoTest extends TestCase
             'reason' => 'Test'
         ]);
 
-        $dto = IncomeCreateDto::createFromRequest($request);
+        $dto = IncomeDto::createFromRequest($request);
 
         $this->assertSame(1500.0, $dto->amount);
         $this->assertIsFloat($dto->amount);
@@ -172,7 +172,7 @@ class IncomeCreateDtoTest extends TestCase
             'contribution_percentage' => '85'
         ]);
 
-        $dto = IncomeCreateDto::createFromRequest($request);
+        $dto = IncomeDto::createFromRequest($request);
 
         $this->assertSame(85, $dto->contribution_percentage);
         $this->assertIsInt($dto->contribution_percentage);

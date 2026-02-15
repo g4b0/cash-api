@@ -2,8 +2,7 @@
 
 namespace App\Repository;
 
-use App\Dto\IncomeCreateDto;
-use App\Dto\IncomeUpdateDto;
+use App\Dto\IncomeDto;
 use PDO;
 
 class IncomeRepository extends Repository
@@ -25,11 +24,11 @@ class IncomeRepository extends Repository
      * Create a new income record.
      *
      * @param int $ownerId Member ID who owns this income
-     * @param IncomeCreateDto $dto Validated income data
+     * @param IncomeDto $dto Validated income data
      * @param int $contributionPercentage Contribution percentage (from DTO or member's default)
      * @return int The ID of the created income record
      */
-    public function create(int $ownerId, IncomeCreateDto $dto, int $contributionPercentage): int
+    public function create(int $ownerId, IncomeDto $dto, int $contributionPercentage): int
     {
         $stmt = $this->db->prepare(
             'INSERT INTO income (owner_id, date, reason, amount, contribution_percentage) VALUES (?, ?, ?, ?, ?)'
@@ -40,43 +39,20 @@ class IncomeRepository extends Repository
     }
 
     /**
-     * Update income record fields.
+     * Update income record fields (full replacement).
      *
      * @param int $id Income record ID
-     * @param IncomeUpdateDto $dto Validated update data (only non-null fields will be updated)
+     * @param IncomeDto $dto Validated income data (all fields required)
+     * @param int $contributionPercentage Contribution percentage (from DTO or existing record)
      * @return bool True if update was successful
      */
-    public function update(int $id, IncomeUpdateDto $dto): bool
+    public function update(int $id, IncomeDto $dto, int $contributionPercentage): bool
     {
-        $updates = [];
-        $params = [];
+        $stmt = $this->db->prepare(
+            'UPDATE income SET amount = ?, reason = ?, date = ?, contribution_percentage = ? WHERE id = ?'
+        );
 
-        if ($dto->amount !== null) {
-            $updates[] = "amount = ?";
-            $params[] = $dto->amount;
-        }
-        if ($dto->reason !== null) {
-            $updates[] = "reason = ?";
-            $params[] = $dto->reason;
-        }
-        if ($dto->date !== null) {
-            $updates[] = "date = ?";
-            $params[] = $dto->date;
-        }
-        if ($dto->contribution_percentage !== null) {
-            $updates[] = "contribution_percentage = ?";
-            $params[] = $dto->contribution_percentage;
-        }
-
-        if (empty($updates)) {
-            return true;
-        }
-
-        $params[] = $id;
-        $sql = 'UPDATE income SET ' . implode(', ', $updates) . ' WHERE id = ?';
-        $stmt = $this->db->prepare($sql);
-
-        return $stmt->execute($params);
+        return $stmt->execute([$dto->amount, $dto->reason, $dto->date, $contributionPercentage, $id]);
     }
 
     /**

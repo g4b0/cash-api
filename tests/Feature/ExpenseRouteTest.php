@@ -255,14 +255,18 @@ class ExpenseRouteTest extends TestCase
         $this->assertEquals(404, $this->app->response()->status());
     }
 
-    // PATCH /expense/{id} tests
+    // PUT /expense/{id} tests
     public function testUpdateExpenseWithoutAuthReturns401(): void
     {
         $expenseId = DatabaseSeeder::seedExpense($this->db, $this->memberId, '2025-02-14', 'Groceries', 500);
 
         $this->app->request()->url = "/expense/$expenseId";
-        $this->app->request()->method = 'PATCH';
-        $this->app->request()->data->setData(['amount' => 600]);
+        $this->app->request()->method = 'PUT';
+        $this->app->request()->data->setData([
+            'amount' => 600,
+            'reason' => 'Groceries',
+            'date' => '2025-02-14',
+        ]);
 
         $this->app->start();
 
@@ -276,7 +280,7 @@ class ExpenseRouteTest extends TestCase
         $this->authenticateAs($this->memberId, $this->communityId);
 
         $this->app->request()->url = "/expense/$expenseId";
-        $this->app->request()->method = 'PATCH';
+        $this->app->request()->method = 'PUT';
         $this->app->request()->data->setData([
             'amount' => 600,
             'reason' => 'Updated Groceries',
@@ -300,8 +304,12 @@ class ExpenseRouteTest extends TestCase
         $this->authenticateAs($this->memberId, $this->communityId);
 
         $this->app->request()->url = "/expense/$expenseId";
-        $this->app->request()->method = 'PATCH';
-        $this->app->request()->data->setData(['amount' => 1200]);
+        $this->app->request()->method = 'PUT';
+        $this->app->request()->data->setData([
+            'amount' => 1200,
+            'reason' => 'Rent',
+            'date' => '2025-02-14',
+        ]);
 
         $this->app->start();
 
@@ -313,8 +321,12 @@ class ExpenseRouteTest extends TestCase
         $this->authenticateAs($this->memberId, $this->communityId);
 
         $this->app->request()->url = '/expense/99999';
-        $this->app->request()->method = 'PATCH';
-        $this->app->request()->data->setData(['amount' => 600]);
+        $this->app->request()->method = 'PUT';
+        $this->app->request()->data->setData([
+            'amount' => 600,
+            'reason' => 'Groceries',
+            'date' => '2025-02-14',
+        ]);
 
         $this->app->start();
 

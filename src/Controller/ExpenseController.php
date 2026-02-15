@@ -2,8 +2,7 @@
 
 namespace App\Controller;
 
-use App\Dto\ExpenseCreateDto;
-use App\Dto\ExpenseUpdateDto;
+use App\Dto\ExpenseDto;
 use App\Exception\AppException;
 use App\Repository\ExpenseRepository;
 use App\Repository\MemberRepository;
@@ -39,7 +38,7 @@ class ExpenseController extends Controller
         }
 
         // 3. Validate input via DTO
-        $dto = ExpenseCreateDto::createFromRequest($this->app->request());
+        $dto = ExpenseDto::createFromRequest($this->app->request());
 
         // 4. Create expense record
         $expenseId = $this->expenseRepository->create($ownerId, $dto);
@@ -94,7 +93,7 @@ class ExpenseController extends Controller
         }
 
         // 4. Validate input via DTO
-        $dto = ExpenseUpdateDto::createFromRequest($this->app->request());
+        $dto = ExpenseDto::createFromRequest($this->app->request());
 
         // 5. Execute update
         $this->expenseRepository->update((int) $id, $dto);

@@ -406,11 +406,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-    patch:
+    put:
       tags:
         - Income
-      summary: Update income record
-      description: Updates an income record (only the owner can modify)
+      summary: Replace income record
+      description: Replaces an income record with full data (only the owner can modify). All fields are required.
       security:
         - BearerAuth: []
       parameters:
@@ -427,24 +427,32 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - amount
+                - reason
+                - date
               properties:
                 amount:
                   type: number
                   format: float
                   minimum: 0.01
+                  description: Income amount (must be > 0)
                   example: 1200.00
                 reason:
                   type: string
                   minLength: 1
+                  description: Reason for income
                   example: Updated salary
                 date:
                   type: string
                   format: date
+                  description: Income date
                   example: '2025-02-15'
                 contribution_percentage:
                   type: integer
                   minimum: 0
                   maximum: 100
+                  description: Contribution percentage (defaults to current value if not provided)
                   example: 85
       responses:
         '200':
@@ -617,11 +625,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-    patch:
+    put:
       tags:
         - Expense
-      summary: Update expense record
-      description: Updates an expense record (only the owner can modify)
+      summary: Replace expense record
+      description: Replaces an expense record with full data (only the owner can modify). All fields are required.
       security:
         - BearerAuth: []
       parameters:
@@ -638,19 +646,26 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - amount
+                - reason
+                - date
               properties:
                 amount:
                   type: number
                   format: float
                   minimum: 0.01
+                  description: Expense amount (must be > 0)
                   example: 600.00
                 reason:
                   type: string
                   minLength: 1
+                  description: Reason for expense
                   example: Updated groceries
                 date:
                   type: string
                   format: date
+                  description: Expense date
                   example: '2025-02-15'
       responses:
         '200':

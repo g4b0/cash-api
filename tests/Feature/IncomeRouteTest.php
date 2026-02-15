@@ -294,14 +294,18 @@ class IncomeRouteTest extends TestCase
         $this->assertEquals(404, $this->app->response()->status());
     }
 
-    // PATCH /income/{id} tests
+    // PUT /income/{id} tests
     public function testUpdateIncomeWithoutAuthReturns401(): void
     {
         $incomeId = DatabaseSeeder::seedIncome($this->db, $this->memberId, '2025-02-14', 'Salary', 1000, 75);
 
         $this->app->request()->url = "/income/$incomeId";
-        $this->app->request()->method = 'PATCH';
-        $this->app->request()->data->setData(['amount' => 1500]);
+        $this->app->request()->method = 'PUT';
+        $this->app->request()->data->setData([
+            'amount' => 1500,
+            'reason' => 'Salary',
+            'date' => '2025-02-14',
+        ]);
 
         $this->app->start();
 
@@ -315,7 +319,7 @@ class IncomeRouteTest extends TestCase
         $this->authenticateAs($this->memberId, $this->communityId);
 
         $this->app->request()->url = "/income/$incomeId";
-        $this->app->request()->method = 'PATCH';
+        $this->app->request()->method = 'PUT';
         $this->app->request()->data->setData([
             'amount' => 1500,
             'reason' => 'Updated Salary',
@@ -341,8 +345,12 @@ class IncomeRouteTest extends TestCase
         $this->authenticateAs($this->memberId, $this->communityId);
 
         $this->app->request()->url = "/income/$incomeId";
-        $this->app->request()->method = 'PATCH';
-        $this->app->request()->data->setData(['reason' => 'Bonus']);
+        $this->app->request()->method = 'PUT';
+        $this->app->request()->data->setData([
+            'amount' => 1000,
+            'reason' => 'Bonus',
+            'date' => '2025-02-14',
+        ]);
 
         $this->app->start();
 
@@ -350,7 +358,7 @@ class IncomeRouteTest extends TestCase
 
         $body = json_decode($this->app->response()->getBody(), true);
         $this->assertEquals('Bonus', $body['reason']);
-        $this->assertEquals('1000', $body['amount']); // Unchanged
+        $this->assertEquals('1000', $body['amount']);
     }
 
     public function testUpdateIncomeAmountOnly(): void
@@ -360,8 +368,12 @@ class IncomeRouteTest extends TestCase
         $this->authenticateAs($this->memberId, $this->communityId);
 
         $this->app->request()->url = "/income/$incomeId";
-        $this->app->request()->method = 'PATCH';
-        $this->app->request()->data->setData(['amount' => 2000]);
+        $this->app->request()->method = 'PUT';
+        $this->app->request()->data->setData([
+            'amount' => 2000,
+            'reason' => 'Salary',
+            'date' => '2025-02-14',
+        ]);
 
         $this->app->start();
 
@@ -369,7 +381,7 @@ class IncomeRouteTest extends TestCase
 
         $body = json_decode($this->app->response()->getBody(), true);
         $this->assertEquals('2000', $body['amount']);
-        $this->assertEquals('Salary', $body['reason']); // Unchanged
+        $this->assertEquals('Salary', $body['reason']);
     }
 
     public function testUpdateIncomeDateOnly(): void
@@ -379,8 +391,12 @@ class IncomeRouteTest extends TestCase
         $this->authenticateAs($this->memberId, $this->communityId);
 
         $this->app->request()->url = "/income/$incomeId";
-        $this->app->request()->method = 'PATCH';
-        $this->app->request()->data->setData(['date' => '2025-03-01']);
+        $this->app->request()->method = 'PUT';
+        $this->app->request()->data->setData([
+            'amount' => 1000,
+            'reason' => 'Salary',
+            'date' => '2025-03-01',
+        ]);
 
         $this->app->start();
 
@@ -397,8 +413,13 @@ class IncomeRouteTest extends TestCase
         $this->authenticateAs($this->memberId, $this->communityId);
 
         $this->app->request()->url = "/income/$incomeId";
-        $this->app->request()->method = 'PATCH';
-        $this->app->request()->data->setData(['contribution_percentage' => 90]);
+        $this->app->request()->method = 'PUT';
+        $this->app->request()->data->setData([
+            'amount' => 1000,
+            'reason' => 'Salary',
+            'date' => '2025-02-14',
+            'contribution_percentage' => 90,
+        ]);
 
         $this->app->start();
 
@@ -415,8 +436,12 @@ class IncomeRouteTest extends TestCase
         $this->authenticateAs($this->memberId, $this->communityId);
 
         $this->app->request()->url = "/income/$incomeId";
-        $this->app->request()->method = 'PATCH';
-        $this->app->request()->data->setData(['amount' => 3000]);
+        $this->app->request()->method = 'PUT';
+        $this->app->request()->data->setData([
+            'amount' => 3000,
+            'reason' => 'Salary',
+            'date' => '2025-02-14',
+        ]);
 
         $this->app->start();
 
@@ -428,8 +453,12 @@ class IncomeRouteTest extends TestCase
         $this->authenticateAs($this->memberId, $this->communityId);
 
         $this->app->request()->url = '/income/99999';
-        $this->app->request()->method = 'PATCH';
-        $this->app->request()->data->setData(['amount' => 1500]);
+        $this->app->request()->method = 'PUT';
+        $this->app->request()->data->setData([
+            'amount' => 1500,
+            'reason' => 'Salary',
+            'date' => '2025-02-14',
+        ]);
 
         $this->app->start();
 

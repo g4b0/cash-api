@@ -2,8 +2,7 @@
 
 namespace Tests\Unit\Repository;
 
-use App\Dto\ExpenseCreateDto;
-use App\Dto\ExpenseUpdateDto;
+use App\Dto\ExpenseDto;
 use App\Repository\ExpenseRepository;
 use flight\net\Request;
 use PDO;
@@ -55,7 +54,7 @@ class ExpenseRepositoryTest extends TestCase
             'reason' => 'Utilities',
             'date' => '2025-02-14'
         ]);
-        $dto = ExpenseCreateDto::createFromRequest($request);
+        $dto = ExpenseDto::createFromRequest($request);
 
         $expenseId = $this->repository->create($this->memberId, $dto);
 
@@ -78,8 +77,9 @@ class ExpenseRepositoryTest extends TestCase
         $request->data->setData([
             'reason' => 'Updated Groceries',
             'amount' => 600.00,
+            'date' => '2025-02-15',
         ]);
-        $dto = ExpenseUpdateDto::createFromRequest($request);
+        $dto = ExpenseDto::createFromRequest($request);
 
         $result = $this->repository->update($expenseId, $dto);
 
@@ -88,6 +88,7 @@ class ExpenseRepositoryTest extends TestCase
         $expense = $this->repository->findById($expenseId);
         $this->assertEquals('Updated Groceries', $expense['reason']);
         $this->assertEquals('600', $expense['amount']);
+        $this->assertEquals('2025-02-15', $expense['date']);
     }
 
     public function testUpdateWithEmptyFieldsReturnsTrue(): void
@@ -95,8 +96,12 @@ class ExpenseRepositoryTest extends TestCase
         $expenseId = DatabaseSeeder::seedExpense($this->db, $this->memberId, '2025-02-14', 'Groceries', 500.00);
 
         $request = new Request();
-        $request->data->setData([]);
-        $dto = ExpenseUpdateDto::createFromRequest($request);
+        $request->data->setData([
+            'amount' => 500.00,
+            'reason' => 'Groceries',
+            'date' => '2025-02-14',
+        ]);
+        $dto = ExpenseDto::createFromRequest($request);
 
         $result = $this->repository->update($expenseId, $dto);
 

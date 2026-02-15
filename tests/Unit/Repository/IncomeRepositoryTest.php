@@ -2,8 +2,7 @@
 
 namespace Tests\Unit\Repository;
 
-use App\Dto\IncomeCreateDto;
-use App\Dto\IncomeUpdateDto;
+use App\Dto\IncomeDto;
 use App\Repository\IncomeRepository;
 use flight\net\Request;
 use PDO;
@@ -56,7 +55,7 @@ class IncomeRepositoryTest extends TestCase
             'reason' => 'Bonus',
             'date' => '2025-02-14'
         ]);
-        $dto = IncomeCreateDto::createFromRequest($request);
+        $dto = IncomeDto::createFromRequest($request);
 
         $incomeId = $this->repository->create($this->memberId, $dto, 80);
 
@@ -80,17 +79,19 @@ class IncomeRepositoryTest extends TestCase
         $request->data->setData([
             'reason' => 'Updated Salary',
             'amount' => 1500.00,
+            'date' => '2025-02-15',
             'contribution_percentage' => 85,
         ]);
-        $dto = IncomeUpdateDto::createFromRequest($request);
+        $dto = IncomeDto::createFromRequest($request);
 
-        $result = $this->repository->update($incomeId, $dto);
+        $result = $this->repository->update($incomeId, $dto, 85);
 
         $this->assertTrue($result);
 
         $income = $this->repository->findById($incomeId);
         $this->assertEquals('Updated Salary', $income['reason']);
         $this->assertEquals('1500', $income['amount']);
+        $this->assertEquals('2025-02-15', $income['date']);
         $this->assertEquals(85, $income['contribution_percentage']);
     }
 
@@ -99,10 +100,14 @@ class IncomeRepositoryTest extends TestCase
         $incomeId = DatabaseSeeder::seedIncome($this->db, $this->memberId, '2025-02-14', 'Salary', 1000.00, 75);
 
         $request = new Request();
-        $request->data->setData([]);
-        $dto = IncomeUpdateDto::createFromRequest($request);
+        $request->data->setData([
+            'amount' => 1000.00,
+            'reason' => 'Salary',
+            'date' => '2025-02-14',
+        ]);
+        $dto = IncomeDto::createFromRequest($request);
 
-        $result = $this->repository->update($incomeId, $dto);
+        $result = $this->repository->update($incomeId, $dto, 75);
 
         $this->assertTrue($result);
     }

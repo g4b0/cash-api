@@ -5,11 +5,12 @@ namespace App\Dto;
 use App\Validation\Validator;
 use flight\net\Request;
 
-class ExpenseCreateDto extends Dto
+class IncomeDto extends Dto
 {
     public float $amount;
     public string $reason;
     public string $date;
+    public ?int $contribution_percentage;
 
     public static function createFromRequest(Request $request): self
     {
@@ -20,6 +21,7 @@ class ExpenseCreateDto extends Dto
         $dto->amount = $validator->validateAmount($data->amount ?? null);
         $dto->reason = $validator->validateReason($data->reason ?? null);
         $dto->date = $validator->validateDate($data->date ?? null);
+        $dto->contribution_percentage = $validator->validateContributionPercentage($data->contribution_percentage ?? null);
 
         return $dto;
     }
