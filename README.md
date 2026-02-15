@@ -89,7 +89,7 @@ Response:
 
 | Method | Endpoint | Description | Authorization |
 |--------|----------|-------------|---------------|
-| GET | `/balance/{communityId}/{member_id}` | Get member's balance | Same community |
+| GET | `/balance/{communityId}/{memberId}` | Get member's balance | Same community |
 
 **Example: Get Balance**
 ```bash
@@ -105,7 +105,7 @@ curl http://localhost:8000/balance/1/1 \
 
 | Method | Endpoint | Description | Authorization |
 |--------|----------|-------------|---------------|
-| GET | `/transactions/{communityId}/{member_id}[/{num}[/{page}]]` | Get paginated list of member's transactions | Same community |
+| GET | `/transactions/{communityId}/{memberId}[/{num}[/{page}]]` | Get paginated list of member's transactions | Same community |
 
 **Example: Get Transactions (Default)**
 ```bash

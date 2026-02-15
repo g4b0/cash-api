@@ -21,7 +21,7 @@ abstract class Controller
     /**
      * Get the authenticated user from JWT middleware.
      *
-     * @return object JWT payload with sub (member_id) and cid (community_id)
+     * @return object JWT payload with sub (memberId) and cid (communityId)
      */
     protected function getAuthUser(): object
     {

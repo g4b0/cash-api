@@ -28,8 +28,8 @@ class TransactionsController extends Controller
     }
 
     public function list(
-        string $community_id,
-        string $member_id,
+        string $communityId,
+        string $memberId,
         ?string $num = null,
         ?string $page = null
     ): void {
@@ -38,7 +38,7 @@ class TransactionsController extends Controller
         $authCommunityId = (int) $authUser->cid;
 
         // Verify requested member exists and belongs to a community
-        $memberCommunityId = $this->memberRepository->getCommunityId((int) $member_id);
+        $memberCommunityId = $this->memberRepository->getCommunityId((int) $memberId);
 
         if ($memberCommunityId === null) {
             throw AppException::MEMBER_NOT_FOUND();
@@ -54,7 +54,7 @@ class TransactionsController extends Controller
         $currentPage = $this->validator->validatePage($page);
 
         // Count total items
-        $totalItems = $this->transactionRepository->countByMemberId((int) $member_id);
+        $totalItems = $this->transactionRepository->countByMemberId((int) $memberId);
 
         // Calculate total pages
         $totalPages = $totalItems > 0 ? (int) ceil($totalItems / $perPage) : 0;
@@ -64,7 +64,7 @@ class TransactionsController extends Controller
 
         // Fetch paginated data
         $transactions = $this->transactionRepository->findPaginatedByMemberId(
-            (int) $member_id,
+            (int) $memberId,
             $perPage,
             $offset
         );
@@ -88,14 +88,14 @@ class TransactionsController extends Controller
         $this->json($response);
     }
 
-    public function balance(string $community_id, string $member_id): void
+    public function balance(string $communityId, string $memberId): void
     {
         // Get authenticated user
         $authUser = $this->getAuthUser();
         $authCommunityId = (int) $authUser->cid;
 
         // Verify requested member exists and belongs to a community
-        $memberCommunityId = $this->memberRepository->getCommunityId((int) $member_id);
+        $memberCommunityId = $this->memberRepository->getCommunityId((int) $memberId);
 
         if ($memberCommunityId === null) {
             throw AppException::MEMBER_NOT_FOUND();
@@ -108,8 +108,8 @@ class TransactionsController extends Controller
 
         // Calculate and return balance
         $calculator = new BalanceCalculator($this->getDb());
-        $balance = $calculator->calculate((int) $member_id);
+        $balance = $calculator->calculate((int) $memberId);
 
-        $this->json(new BalanceResponse((int) $member_id, $balance));
+        $this->json(new BalanceResponse((int) $memberId, $balance));
     }
 }

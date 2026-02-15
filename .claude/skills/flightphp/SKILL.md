@@ -16,9 +16,9 @@ user-invocable: true
 ## Route Registration
 
 - Extract route registration into a reusable function (`registerRoutes(\flight\Engine $app)`) so both `index.php` and tests share the same routes.
-- Route params use `@` prefix: `$app->route('GET /@community_id/@member_id', $callback)`.
+- Route params use `@` prefix: `$app->route('GET /@communityId/@memberId', $callback)`.
 - **Optional params**: Wrap segments in parentheses: `$app->route('GET /path/@required(/@optional1(/@optional2))', $callback)`. Optional params are passed as `null` if not provided. Use nullable types (`?string`, `?int`) in method signatures.
-  - Example: `/transactions/@community_id/@member_id(/@num(/@page))` matches `/transactions/1/2`, `/transactions/1/2/25`, and `/transactions/1/2/25/3`.
+  - Example: `/transactions/@communityId/@memberId(/@num(/@page))` matches `/transactions/1/2`, `/transactions/1/2/25`, and `/transactions/1/2/25/3`.
 - JSON responses: `$app->json($data, $statusCode)`.
 
 ## Controllers

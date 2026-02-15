@@ -37,7 +37,7 @@ php7.4 ./vendor/bin/phpunit
 Flight PHP is a micro framework with route-based architecture. Key conventions:
 
 - Routes are registered via `Flight::route()`
-- Route parameters use `@` prefix: `/balance/@community_id/@member_id`
+- Route parameters use `@` prefix: `/balance/@communityId/@memberId`
 - Optional route parameters use parentheses: `/path/@required(/@optional1(/@optional2))` — unmatched params are `null`
 - The framework entry point is typically a single `index.php` that bootstraps routes and middleware
 - Flight uses `Flight::json()` for JSON responses (this is a REST API backend)

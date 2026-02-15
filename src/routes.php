@@ -29,7 +29,7 @@ function registerRoutes(Engine $app): void
     $app->route('DELETE /expense/@id', [ExpenseController::class, 'delete']);
 
     // Transactions
-    $app->route('GET /balance/@community_id/@member_id', [TransactionsController::class, 'balance']);
+    $app->route('GET /balance/@communityId/@memberId', [TransactionsController::class, 'balance']);
 
-    $app->route('GET /transactions/@community_id/@member_id(/@num(/@page))', [TransactionsController::class, 'list']);
+    $app->route('GET /transactions/@communityId/@memberId(/@num(/@page))', [TransactionsController::class, 'list']);
 }
