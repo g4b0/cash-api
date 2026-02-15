@@ -300,6 +300,7 @@ cash/
 │   ├── Exception/         # Custom exceptions (AppException)
 │   ├── Middleware/        # JWT auth & exception handling
 │   ├── Repository/        # Database queries (Income, Expense, Member, Transaction)
+│   ├── Response/          # Type-safe response objects (Income, Expense, Token, Paginated, etc.)
 │   ├── Service/           # Business logic (JWT, balance calc)
 │   ├── Validation/        # Input validators (shared Validator class)
 │   └── routes.php         # Route definitions

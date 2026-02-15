@@ -3,7 +3,6 @@
 namespace Tests\Unit\Response;
 
 use App\Response\CreatedResourceResponse;
-use App\Response\EntityResponse;
 use App\Response\MetricResponse;
 use App\Response\NoContentResponse;
 use App\Response\PaginatedResponse;
@@ -27,22 +26,6 @@ class ResponseTest extends TestCase
 
         $json = json_encode($response);
         $this->assertEquals('{"id":456}', $json);
-    }
-
-    public function testEntityResponseReturns200WithEntityData(): void
-    {
-        $entity = [
-            'id' => 1,
-            'amount' => 1000,
-            'reason' => 'Salary',
-            'date' => '2025-02-15',
-        ];
-
-        $response = new EntityResponse($entity);
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($entity, $response->toArray());
-        $this->assertNull($response->getLocationHeader());
     }
 
     public function testNoContentResponseReturns204WithEmptyBody(): void
@@ -130,7 +113,6 @@ class ResponseTest extends TestCase
         // Test that all response classes implement JsonSerializable correctly
         $responses = [
             new CreatedResourceResponse(1, 'test'),
-            new EntityResponse(['key' => 'value']),
             new NoContentResponse(),
             new TokenPairResponse('access', 'refresh'),
             new MetricResponse('metric', 123),

@@ -191,6 +191,118 @@ $this->incomeRepository->update($id, $dto, $contributionPercentage);
 
 **Validation**: DTOs delegate to existing `Validator` class methods, maintaining consistency with validation rules and error messages.
 
+### Response Pattern
+
+Output formatting uses Response classes for type safety and consistency.
+
+**Location**: `src/Response/`
+
+**Naming**: `{Entity}Response` (e.g., `IncomeResponse`, `ExpenseResponse`, `CreatedResourceResponse`)
+
+**Base Class**: All response classes extend `AppResponse` (abstract base) which implements `JsonSerializable`
+
+**Specialized Responses** — Type-safe response objects with proper inheritance:
+
+```php
+// Abstract base for shared money flow fields
+abstract class MoneyFlowResponse extends AppResponse
+{
+    public int $id;
+    public int $ownerId;
+    public \DateTime $date;
+    public string $reason;
+    public float $amount;
+    public \DateTime $createdAt;
+    public \DateTime $updatedAt;
+
+    public function __construct(array $data)
+    {
+        $this->id = (int) $data['id'];
+        $this->ownerId = (int) $data['owner_id'];
+        $this->date = new \DateTime($data['date']);
+        $this->reason = $data['reason'];
+        $this->amount = (float) $data['amount'];
+        $this->createdAt = new \DateTime($data['created_at']);
+        $this->updatedAt = new \DateTime($data['updated_at']);
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'owner_id' => $this->ownerId,
+            'date' => $this->date->format('Y-m-d'),
+            'reason' => $this->reason,
+            'amount' => (string) $this->amount,
+            'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
+        ];
+    }
+}
+
+// Income-specific response extending shared base
+class IncomeResponse extends MoneyFlowResponse
+{
+    public int $contributionPercentage;
+
+    public function __construct(array $data)
+    {
+        parent::__construct($data);
+        $this->contributionPercentage = (int) $data['contribution_percentage'];
+    }
+
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'contribution_percentage' => (string) $this->contributionPercentage,
+        ]);
+    }
+}
+
+// Expense-specific response (inherits all from MoneyFlowResponse)
+class ExpenseResponse extends MoneyFlowResponse
+{
+    // No additional fields needed
+}
+```
+
+**Usage in Controllers**:
+
+```php
+// GET /income/@id - Return single income record
+$income = $this->incomeRepository->findById($id);
+$this->json(new IncomeResponse($income));
+
+// PUT /income/@id - Return updated income record
+$this->incomeRepository->update($id, $dto, $contributionPercentage);
+$updated = $this->incomeRepository->findById($id);
+$this->json(new IncomeResponse($updated));
+
+// GET /expense/@id - Return single expense record
+$expense = $this->expenseRepository->findById($id);
+$this->json(new ExpenseResponse($expense));
+```
+
+**Benefits**:
+- Type-safe property access (`$response->amount` is guaranteed float)
+- DateTime objects for proper date handling (not raw strings)
+- Centralized formatting logic (amount as string, date formats)
+- Inheritance reduces duplication (MoneyFlowResponse shared by Income and Expense)
+- Prevents heterogeneous array bugs (typed properties enforce structure)
+- Self-documenting code (`IncomeResponse` vs. raw array)
+
+**Response Classes**:
+- `CreatedResourceResponse` - POST endpoints (201 + Location header + resource ID)
+- `NoContentResponse` - DELETE endpoints (204 + empty body)
+- `TokenPairResponse` - Auth endpoints (200 + access/refresh tokens)
+- `MetricResponse` - Dashboard endpoints (200 + named metric)
+- `PaginatedResponse` - List endpoints (200 + data + pagination metadata)
+- `MoneyFlowResponse` - Abstract base for income/expense responses
+- `IncomeResponse` - GET/PUT `/income/@id` endpoints
+- `ExpenseResponse` - GET/PUT `/expense/@id` endpoints
+
+**Note**: Response classes are tested indirectly via Feature tests (testing actual HTTP responses), not via dedicated Unit tests, since they are primarily data structures without complex logic.
+
 ## Development Principles
 
 - **Test-Driven Development (TDD)**: write a failing test first, make it pass, then refactor. Every feature or bug fix starts with a test.
