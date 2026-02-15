@@ -46,11 +46,11 @@ class IncomeController extends Controller
         // 5. Create income record
         $incomeId = $this->incomeRepository->create($ownerId, $dto, $contributionPercentage);
 
-        // 6. Fetch created record
-        $income = $this->incomeRepository->findById($incomeId);
+        // 6. Set Location header per RFC 9110
+        $this->app->response()->header('Location', "/income/$incomeId");
 
-        // 7. Return 201 Created
-        $this->json($income, 201);
+        // 7. Return 201 Created with resource identifier
+        $this->json(['id' => $incomeId], 201);
     }
 
     public function read(string $id): void

@@ -43,11 +43,11 @@ class ExpenseController extends Controller
         // 4. Create expense record
         $expenseId = $this->expenseRepository->create($ownerId, $dto);
 
-        // 5. Fetch created record
-        $expense = $this->expenseRepository->findById($expenseId);
+        // 5. Set Location header per RFC 9110
+        $this->app->response()->header('Location', "/expense/$expenseId");
 
-        // 6. Return 201 Created
-        $this->json($expense, 201);
+        // 6. Return 201 Created with resource identifier
+        $this->json(['id' => $expenseId], 201);
     }
 
     public function read(string $id): void

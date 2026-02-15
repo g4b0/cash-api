@@ -150,6 +150,12 @@ $dto = IncomeDto::createFromRequest($this->app->request());
 // Use $dto->amount, $dto->reason, etc. (type-safe, validated)
 $contributionPercentage = $dto->contribution_percentage ?? $member['contribution_percentage'];
 $incomeId = $this->incomeRepository->create($ownerId, $dto, $contributionPercentage);
+
+// Set Location header per RFC 9110
+$this->app->response()->header('Location', "/income/$incomeId");
+
+// Return 201 with resource identifier
+$this->json(['id' => $incomeId], 201);
 ```
 
 *Update (PUT):*
@@ -161,10 +167,15 @@ $this->incomeRepository->update($id, $dto, $contributionPercentage);
 ```
 
 **HTTP Methods**:
-- **POST** `/income` — Create new income record
+- **POST** `/income` — Create new income record (returns `{'id': X}` + Location header per RFC 9110)
 - **PUT** `/income/@id` — Replace entire income record (all fields required)
 - **GET** `/income/@id` — Retrieve income record
 - **DELETE** `/income/@id` — Delete income record
+
+**POST Response (RFC 9110)**:
+- Status: `201 Created`
+- Header: `Location: /income/{id}` (URI of created resource)
+- Body: `{"id": 123}` (resource identifier only, not full entity)
 
 **Responsibility Separation**:
 - **DTOs**: Transport and validate data (no logic)

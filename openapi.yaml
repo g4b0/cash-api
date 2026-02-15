@@ -341,10 +341,21 @@ paths:
       responses:
         '201':
           description: Income created successfully
+          headers:
+            Location:
+              description: URI of the created income resource (RFC 9110)
+              schema:
+                type: string
+                example: /income/1
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Income'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: ID of the created income record
+                    example: 1
         '400':
           description: Validation error
           content:
@@ -560,10 +571,21 @@ paths:
       responses:
         '201':
           description: Expense created successfully
+          headers:
+            Location:
+              description: URI of the created expense resource (RFC 9110)
+              schema:
+                type: string
+                example: /expense/1
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Expense'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: ID of the created expense record
+                    example: 1
         '400':
           description: Validation error
           content:
