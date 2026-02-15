@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Exception\AppException;
 use App\Repository\MemberRepository;
+use App\Response\TokenPairResponse;
 use App\Service\JwtService;
 use flight\Engine;
 
@@ -38,10 +39,10 @@ class AuthController extends Controller
 
         $jwtService = new JwtService($this->app->get('jwt_secret'));
 
-        $this->json([
-            'access_token' => $jwtService->generateAccessToken((int) $member['id'], (int) $member['community_id']),
-            'refresh_token' => $jwtService->generateRefreshToken((int) $member['id'], (int) $member['community_id']),
-        ]);
+        $accessToken = $jwtService->generateAccessToken((int) $member['id'], (int) $member['community_id']);
+        $refreshToken = $jwtService->generateRefreshToken((int) $member['id'], (int) $member['community_id']);
+
+        $this->json(new TokenPairResponse($accessToken, $refreshToken));
     }
 
     public function refresh(): void
@@ -61,10 +62,10 @@ class AuthController extends Controller
                 throw AppException::INVALID_TOKEN_TYPE();
             }
 
-            $this->json([
-                'access_token' => $jwtService->generateAccessToken((int) $decoded->sub, (int) $decoded->cid),
-                'refresh_token' => $jwtService->generateRefreshToken((int) $decoded->sub, (int) $decoded->cid),
-            ]);
+            $accessToken = $jwtService->generateAccessToken((int) $decoded->sub, (int) $decoded->cid);
+            $refreshToken = $jwtService->generateRefreshToken((int) $decoded->sub, (int) $decoded->cid);
+
+            $this->json(new TokenPairResponse($accessToken, $refreshToken));
         } catch (AppException $e) {
             throw $e;
         } catch (\Exception $e) {

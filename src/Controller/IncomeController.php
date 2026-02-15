@@ -6,6 +6,9 @@ use App\Dto\IncomeDto;
 use App\Exception\AppException;
 use App\Repository\IncomeRepository;
 use App\Repository\MemberRepository;
+use App\Response\CreatedResourceResponse;
+use App\Response\EntityResponse;
+use App\Response\NoContentResponse;
 use App\Validation\Validator;
 use flight\Engine;
 
@@ -44,11 +47,8 @@ class IncomeController extends Controller
         // 5. Create income record
         $incomeId = $this->incomeRepository->create($ownerId, $dto, $contributionPercentage);
 
-        // 6. Set Location header per RFC 9110
-        $this->app->response()->header('Location', "/income/$incomeId");
-
-        // 7. Return 201 Created with resource identifier
-        $this->json(['id' => $incomeId], 201);
+        // 6. Return 201 Created with resource identifier (Location header set automatically)
+        $this->json(new CreatedResourceResponse($incomeId, 'income'));
     }
 
     public function read(string $id): void
@@ -72,7 +72,7 @@ class IncomeController extends Controller
         }
 
         // 4. Return record
-        $this->json($income);
+        $this->json(new EntityResponse($income));
     }
 
     public function update(string $id): void
@@ -106,7 +106,7 @@ class IncomeController extends Controller
         $updated = $this->incomeRepository->findById((int) $id);
 
         // 8. Return updated record
-        $this->json($updated);
+        $this->json(new EntityResponse($updated));
     }
 
     public function delete(string $id): void
@@ -131,6 +131,6 @@ class IncomeController extends Controller
         $this->incomeRepository->delete((int) $id);
 
         // 5. Return 204 No Content
-        $this->json(null, 204);
+        $this->json(new NoContentResponse());
     }
 }

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Exception\AppException;
 use App\Repository\MemberRepository;
+use App\Response\MetricResponse;
 use App\Service\BalanceCalculator;
 use flight\Engine;
 
@@ -39,6 +40,6 @@ class DashboardController extends Controller
         $calculator = new BalanceCalculator($this->getDb());
         $balance = $calculator->calculate((int) $member_id);
 
-        $this->json(['balance' => $balance]);
+        $this->json(new MetricResponse('balance', $balance));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Response\AppResponse;
 use flight\Engine;
 use PDO;
 
@@ -38,11 +39,28 @@ abstract class Controller
     /**
      * Return a JSON response.
      *
-     * @param mixed $data
-     * @param int $statusCode
+     * Supports both AppResponse objects and raw data for backward compatibility.
+     * When using AppResponse objects, status code and Location header are extracted
+     * automatically from the response object.
+     *
+     * @param mixed $data AppResponse object or raw data (array, etc.)
+     * @param int $statusCode HTTP status code (ignored if $data is AppResponse)
      */
     protected function json($data, int $statusCode = 200): void
     {
-        $this->app->json($data, $statusCode);
+        if ($data instanceof AppResponse) {
+            // Extract status code and Location header from response object
+            $statusCode = $data->getStatusCode();
+
+            if ($data->getLocationHeader() !== null) {
+                $this->app->response()->header('Location', $data->getLocationHeader());
+            }
+
+            // JsonSerializable interface handles array conversion
+            $this->app->json($data, $statusCode);
+        } else {
+            // Backward compatibility: support raw arrays during migration
+            $this->app->json($data, $statusCode);
+        }
     }
 }

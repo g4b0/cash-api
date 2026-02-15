@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Exception\AppException;
 use App\Repository\MemberRepository;
 use App\Repository\TransactionRepository;
+use App\Response\PaginatedResponse;
 use App\Validation\Validator;
 use flight\Engine;
 
@@ -65,14 +66,12 @@ class TransactionsController extends Controller
         );
 
         // Return response with data and pagination metadata
-        $this->json([
-            'data' => $transactions,
-            'pagination' => [
-                'current_page' => $currentPage,
-                'total_pages' => $totalPages,
-                'total_items' => $totalItems,
-                'per_page' => $perPage,
-            ],
-        ]);
+        $this->json(new PaginatedResponse(
+            $transactions,
+            $currentPage,
+            $totalPages,
+            $totalItems,
+            $perPage
+        ));
     }
 }
