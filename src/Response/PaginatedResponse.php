@@ -21,14 +21,11 @@ namespace App\Response;
  */
 class PaginatedResponse extends AppResponse
 {
-    private array $data;
-    private int $currentPage;
-    private int $totalPages;
-    private int $totalItems;
-    private int $perPage;
+    public array $data;
+    public object $pagination; // Nested object with pagination metadata
 
     /**
-     * @param array $data The paginated data items
+     * @param array $data Data items
      * @param int $currentPage Current page number
      * @param int $totalPages Total number of pages
      * @param int $totalItems Total number of items across all pages
@@ -42,22 +39,11 @@ class PaginatedResponse extends AppResponse
         int $perPage
     ) {
         $this->data = $data;
-        $this->currentPage = $currentPage;
-        $this->totalPages = $totalPages;
-        $this->totalItems = $totalItems;
-        $this->perPage = $perPage;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'data' => $this->data,
-            'pagination' => [
-                'current_page' => $this->currentPage,
-                'total_pages' => $this->totalPages,
-                'total_items' => $this->totalItems,
-                'per_page' => $this->perPage,
-            ],
+        $this->pagination = (object) [
+            'current_page' => $currentPage,
+            'total_pages' => $totalPages,
+            'total_items' => $totalItems,
+            'per_page' => $perPage,
         ];
     }
 }

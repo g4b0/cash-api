@@ -15,8 +15,8 @@ namespace App\Response;
  */
 class CreatedResourceResponse extends AppResponse
 {
-    private int $id;
-    private string $resourceType;
+    public int $id;
+    private string $resourceType; // private: used only for Location header, not serialized
 
     /**
      * @param int $id The ID of the created resource
@@ -31,11 +31,6 @@ class CreatedResourceResponse extends AppResponse
     public function getStatusCode(): int
     {
         return 201;
-    }
-
-    public function toArray(): array
-    {
-        return ['id' => $this->id];
     }
 
     public function getLocationHeader(): ?string

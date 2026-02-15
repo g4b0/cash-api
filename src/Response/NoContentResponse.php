@@ -17,9 +17,4 @@ class NoContentResponse extends AppResponse
     {
         return 204;
     }
-
-    public function toArray(): array
-    {
-        return [];
-    }
 }

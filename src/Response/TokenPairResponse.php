@@ -13,8 +13,8 @@ namespace App\Response;
  */
 class TokenPairResponse extends AppResponse
 {
-    private string $accessToken;
-    private string $refreshToken;
+    public string $access_token;
+    public string $refresh_token;
 
     /**
      * @param string $accessToken The JWT access token
@@ -22,15 +22,7 @@ class TokenPairResponse extends AppResponse
      */
     public function __construct(string $accessToken, string $refreshToken)
     {
-        $this->accessToken = $accessToken;
-        $this->refreshToken = $refreshToken;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'access_token' => $this->accessToken,
-            'refresh_token' => $this->refreshToken,
-        ];
+        $this->access_token = $accessToken;
+        $this->refresh_token = $refreshToken;
     }
 }
