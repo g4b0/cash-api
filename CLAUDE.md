@@ -93,7 +93,7 @@ Input validation for POST/PUT/PATCH endpoints uses Data Transfer Objects (DTOs).
 
 **Naming**: `{Entity}{Operation}Dto` (e.g., `IncomeCreateDto`, `ExpenseUpdateDto`)
 
-**Structure**:
+**Create DTOs (POST)** — Required fields:
 ```php
 class IncomeCreateDto extends Dto
 {
@@ -109,17 +109,52 @@ class IncomeCreateDto extends Dto
 }
 ```
 
+**Update DTOs (PATCH)** — All fields optional (nullable):
+```php
+class IncomeUpdateDto extends Dto
+{
+    public ?float $amount = null;
+    public ?string $reason = null;
+    public ?string $date = null;
+    public ?int $contribution_percentage = null;
+
+    public static function createFromRequest(Request $request): self
+    {
+        // Validate only provided fields, leave others null
+    }
+}
+```
+
 **Usage in Controllers**:
+
+*Create (POST):*
 ```php
 $dto = IncomeCreateDto::createFromRequest($this->app->request());
-// Use $dto->amount, $dto->reason, etc. (type-safe properties)
+// Use $dto->amount, $dto->reason, etc. (type-safe, validated)
 ```
+
+*Update (PATCH):*
+```php
+$dto = IncomeUpdateDto::createFromRequest($this->app->request());
+
+// Controller builds updates array from non-null properties
+$updates = [];
+if ($dto->amount !== null) {
+    $updates['amount'] = $dto->amount;
+}
+// ... repeat for other fields
+```
+
+**Responsibility Separation**:
+- **DTOs**: Transport and validate data (no logic)
+- **Controllers**: Handle null checks and build updates array
 
 **Benefits**:
 - Type-safe input handling with property type hints
-- Centralized validation logic
+- Centralized validation logic in dedicated classes
 - Reduced controller boilerplate
 - POST payloads align with GET response structure
+- Clear separation of concerns (DTOs validate, controllers orchestrate)
 
 **Validation**: DTOs delegate to existing `Validator` class methods, maintaining consistency with validation rules and error messages.
 

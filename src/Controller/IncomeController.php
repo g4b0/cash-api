@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Dto\IncomeCreateDto;
+use App\Dto\IncomeUpdateDto;
 use App\Exception\AppException;
 use App\Repository\IncomeRepository;
 use App\Repository\MemberRepository;
@@ -95,30 +96,31 @@ class IncomeController extends Controller
             throw AppException::FORBIDDEN();
         }
 
-        // 4. Get request data and validate provided fields
-        $data = $this->app->request()->data;
+        // 4. Validate input via DTO
+        $dto = IncomeUpdateDto::createFromRequest($this->app->request());
+
+        // 5. Build updates array from non-null DTO properties
         $updates = [];
+        if ($dto->amount !== null) {
+            $updates['amount'] = $dto->amount;
+        }
+        if ($dto->reason !== null) {
+            $updates['reason'] = $dto->reason;
+        }
+        if ($dto->date !== null) {
+            $updates['date'] = $dto->date;
+        }
+        if ($dto->contribution_percentage !== null) {
+            $updates['contribution_percentage'] = $dto->contribution_percentage;
+        }
 
-        if (isset($data->amount)) {
-            $updates['amount'] = $this->validator->validateAmount($data->amount);
-        }
-        if (isset($data->reason)) {
-            $updates['reason'] = $this->validator->validateReason($data->reason);
-        }
-        if (isset($data->date)) {
-            $updates['date'] = $this->validator->validateDate($data->date);
-        }
-        if (isset($data->contribution_percentage)) {
-            $updates['contribution_percentage'] = $this->validator->validateContributionPercentage($data->contribution_percentage);
-        }
-
-        // 5. Execute update
+        // 6. Execute update
         $this->incomeRepository->update((int) $id, $updates);
 
-        // 6. Fetch updated record
+        // 7. Fetch updated record
         $updated = $this->incomeRepository->findById((int) $id);
 
-        // 7. Return updated record
+        // 8. Return updated record
         $this->json($updated);
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Dto\ExpenseCreateDto;
+use App\Dto\ExpenseUpdateDto;
 use App\Exception\AppException;
 use App\Repository\ExpenseRepository;
 use App\Repository\MemberRepository;
@@ -36,21 +38,16 @@ class ExpenseController extends Controller
             throw AppException::FORBIDDEN();
         }
 
-        // 3. Get request data
-        $data = $this->app->request()->data;
+        // 3. Validate input via DTO
+        $dto = ExpenseCreateDto::createFromRequest($this->app->request());
 
-        // 4. Validate required fields
-        $amount = $this->validator->validateAmount($data->amount ?? null);
-        $reason = $this->validator->validateReason($data->reason ?? null);
-        $date = $this->validator->validateDate($data->date ?? null);
+        // 4. Create expense record
+        $expenseId = $this->expenseRepository->create($ownerId, $dto->date, $dto->reason, $dto->amount);
 
-        // 5. Create expense record
-        $expenseId = $this->expenseRepository->create($ownerId, $date, $reason, $amount);
-
-        // 6. Fetch created record
+        // 5. Fetch created record
         $expense = $this->expenseRepository->findById($expenseId);
 
-        // 7. Return 201 Created
+        // 6. Return 201 Created
         $this->json($expense, 201);
     }
 
@@ -96,27 +93,28 @@ class ExpenseController extends Controller
             throw AppException::FORBIDDEN();
         }
 
-        // 4. Get request data and validate provided fields
-        $data = $this->app->request()->data;
+        // 4. Validate input via DTO
+        $dto = ExpenseUpdateDto::createFromRequest($this->app->request());
+
+        // 5. Build updates array from non-null DTO properties
         $updates = [];
+        if ($dto->amount !== null) {
+            $updates['amount'] = $dto->amount;
+        }
+        if ($dto->reason !== null) {
+            $updates['reason'] = $dto->reason;
+        }
+        if ($dto->date !== null) {
+            $updates['date'] = $dto->date;
+        }
 
-        if (isset($data->amount)) {
-            $updates['amount'] = $this->validator->validateAmount($data->amount);
-        }
-        if (isset($data->reason)) {
-            $updates['reason'] = $this->validator->validateReason($data->reason);
-        }
-        if (isset($data->date)) {
-            $updates['date'] = $this->validator->validateDate($data->date);
-        }
-
-        // 5. Execute update
+        // 6. Execute update
         $this->expenseRepository->update((int) $id, $updates);
 
-        // 6. Fetch updated record
+        // 7. Fetch updated record
         $updated = $this->expenseRepository->findById((int) $id);
 
-        // 7. Return updated record
+        // 8. Return updated record
         $this->json($updated);
     }
 
