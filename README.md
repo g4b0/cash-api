@@ -80,8 +80,8 @@ curl -X POST http://localhost:8000/login \
 Response:
 ```json
 {
-  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-  "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+  "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "refreshToken": "eyJ0eXAiOiJKV1QiLCJhbGc..."
 }
 ```
 
@@ -89,7 +89,7 @@ Response:
 
 | Method | Endpoint | Description | Authorization |
 |--------|----------|-------------|---------------|
-| GET | `/balance/{community_id}/{member_id}` | Get member's balance | Same community |
+| GET | `/balance/{communityId}/{member_id}` | Get member's balance | Same community |
 
 **Example: Get Balance**
 ```bash
@@ -99,13 +99,13 @@ curl http://localhost:8000/balance/1/1 \
 
 **Authorization**: User must belong to the same community as the requested member.
 
-**Balance calculation**: `SUM(income × contribution_percentage ÷ 100) - SUM(expenses)`
+**Balance calculation**: `SUM(income × contributionPercentage ÷ 100) - SUM(expenses)`
 
 ### Transactions List (Authenticated)
 
 | Method | Endpoint | Description | Authorization |
 |--------|----------|-------------|---------------|
-| GET | `/transactions/{community_id}/{member_id}[/{num}[/{page}]]` | Get paginated list of member's transactions | Same community |
+| GET | `/transactions/{communityId}/{member_id}[/{num}[/{page}]]` | Get paginated list of member's transactions | Same community |
 
 **Example: Get Transactions (Default)**
 ```bash
@@ -134,9 +134,9 @@ curl http://localhost:8000/transactions/1/1/10/2 \
       "date": "2025-02-14",
       "reason": "Salary",
       "amount": "1000.50",
-      "contribution_percentage": 75,
-      "created_at": "2025-02-14 10:00:00",
-      "updated_at": "2025-02-14 10:00:00"
+      "contributionPercentage": 75,
+      "createdAt": "2025-02-14 10:00:00",
+      "updatedAt": "2025-02-14 10:00:00"
     },
     {
       "id": 2,
@@ -144,16 +144,16 @@ curl http://localhost:8000/transactions/1/1/10/2 \
       "date": "2025-02-13",
       "reason": "Groceries",
       "amount": "500.00",
-      "contribution_percentage": null,
-      "created_at": "2025-02-13 15:30:00",
-      "updated_at": "2025-02-13 15:30:00"
+      "contributionPercentage": null,
+      "createdAt": "2025-02-13 15:30:00",
+      "updatedAt": "2025-02-13 15:30:00"
     }
   ],
   "pagination": {
-    "current_page": 1,
-    "total_pages": 3,
-    "total_items": 67,
-    "per_page": 25
+    "currentPage": 1,
+    "totalPages": 3,
+    "totalItems": 67,
+    "perPage": 25
   }
 }
 ```
@@ -180,7 +180,7 @@ curl -X POST http://localhost:8000/income \
     "amount": 1000.50,
     "reason": "Monthly salary",
     "date": "2025-02-14",
-    "contribution_percentage": 80
+    "contributionPercentage": 80
   }'
 ```
 
@@ -188,7 +188,7 @@ curl -X POST http://localhost:8000/income \
 - `amount` (required): Must be > 0
 - `reason` (required): Description of income
 - `date` (optional): Defaults to today (format: YYYY-MM-DD)
-- `contribution_percentage` (optional): Defaults to member's current percentage (0-100)
+- `contributionPercentage` (optional): Defaults to member's current percentage (0-100)
 
 ### Expense Management (Authenticated)
 
@@ -246,22 +246,22 @@ All fields are optional in PATCH requests - only provided fields will be updated
 ```bash
 # Add a new member
 ./bin/member add \
-  --community_id=1 \
+  --communityId=1 \
   --name="John Doe" \
   --username=johndoe \
   --password=secret123 \
-  --contribution_percentage=85
+  --contributionPercentage=85
 
 # Update a member (any combination of fields)
 ./bin/member update --id=1 --name="Jane Doe"
-./bin/member update --id=1 --contribution_percentage=90
+./bin/member update --id=1 --contributionPercentage=90
 ./bin/member update --id=1 --username=newusername --name="New Name"
 
 # Delete a member
 ./bin/member delete --id=1
 ```
 
-**Note:** `contribution_percentage` defaults to 75 if not specified.
+**Note:** `contributionPercentage` defaults to 75 if not specified.
 
 ## Running Tests
 
@@ -374,7 +374,7 @@ Members contribute to the common account based on their income relative to the c
 **Formula**: `Contributions - Expenses`
 
 Where:
-- **Contributions** = `SUM(income_amount × contribution_percentage ÷ 100)`
+- **Contributions** = `SUM(income_amount × contributionPercentage ÷ 100)`
 - **Expenses** = `SUM(expense_amount)`
 
 Positive balance = money owed to the member (debit)

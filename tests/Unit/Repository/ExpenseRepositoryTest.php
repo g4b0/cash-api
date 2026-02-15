@@ -33,7 +33,7 @@ class ExpenseRepositoryTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertEquals($expenseId, $result['id']);
-        $this->assertEquals($this->memberId, $result['owner_id']);
+        $this->assertEquals($this->memberId, $result['ownerId']);
         $this->assertEquals('2025-02-14', $result['date']);
         $this->assertEquals('Groceries', $result['reason']);
         $this->assertEquals('500', $result['amount']);
@@ -64,7 +64,7 @@ class ExpenseRepositoryTest extends TestCase
         // Verify it was actually created
         $expense = $this->repository->findById($expenseId);
         $this->assertNotNull($expense);
-        $this->assertEquals($this->memberId, $expense['owner_id']);
+        $this->assertEquals($this->memberId, $expense['ownerId']);
         $this->assertEquals('Utilities', $expense['reason']);
         $this->assertEquals('200.75', $expense['amount']);
     }

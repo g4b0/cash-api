@@ -37,24 +37,24 @@ class RefreshTokenRouteTest extends TestCase
 
         $this->app->request()->url = '/refresh';
         $this->app->request()->method = 'POST';
-        $this->app->request()->data->setData(['refresh_token' => $refreshToken]);
+        $this->app->request()->data->setData(['refreshToken' => $refreshToken]);
 
         $this->app->start();
 
         $this->assertEquals(200, $this->app->response()->status());
 
         $body = json_decode($this->app->response()->getBody(), true);
-        $this->assertArrayHasKey('access_token', $body);
-        $this->assertArrayHasKey('refresh_token', $body);
-        $this->assertNotEmpty($body['access_token']);
-        $this->assertNotEmpty($body['refresh_token']);
+        $this->assertArrayHasKey('accessToken', $body);
+        $this->assertArrayHasKey('refreshToken', $body);
+        $this->assertNotEmpty($body['accessToken']);
+        $this->assertNotEmpty($body['refreshToken']);
     }
 
     public function testRefreshWithInvalidToken(): void
     {
         $this->app->request()->url = '/refresh';
         $this->app->request()->method = 'POST';
-        $this->app->request()->data->setData(['refresh_token' => 'garbage-token']);
+        $this->app->request()->data->setData(['refreshToken' => 'garbage-token']);
 
         $this->app->start();
 
@@ -71,7 +71,7 @@ class RefreshTokenRouteTest extends TestCase
 
         $this->app->request()->url = '/refresh';
         $this->app->request()->method = 'POST';
-        $this->app->request()->data->setData(['refresh_token' => $accessToken]);
+        $this->app->request()->data->setData(['refreshToken' => $accessToken]);
 
         $this->app->start();
 

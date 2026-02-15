@@ -61,7 +61,7 @@ class ExpenseController extends Controller
         }
 
         // 3. Verify community access (fetch owner's community)
-        $ownerCommunityId = $this->memberRepository->getCommunityId((int) $expense['owner_id']);
+        $ownerCommunityId = $this->memberRepository->getCommunityId((int) $expense['ownerId']);
 
         if ($ownerCommunityId !== $communityId) {
             throw AppException::FORBIDDEN();
@@ -85,7 +85,7 @@ class ExpenseController extends Controller
         }
 
         // 3. Verify ownership
-        if ((int) $expense['owner_id'] !== $memberId) {
+        if ((int) $expense['ownerId'] !== $memberId) {
             throw AppException::FORBIDDEN();
         }
 
@@ -116,7 +116,7 @@ class ExpenseController extends Controller
         }
 
         // 3. Verify ownership
-        if ((int) $expense['owner_id'] !== $memberId) {
+        if ((int) $expense['ownerId'] !== $memberId) {
             throw AppException::FORBIDDEN();
         }
 

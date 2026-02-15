@@ -33,11 +33,11 @@ class IncomeRepositoryTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertEquals($incomeId, $result['id']);
-        $this->assertEquals($this->memberId, $result['owner_id']);
+        $this->assertEquals($this->memberId, $result['ownerId']);
         $this->assertEquals('2025-02-14', $result['date']);
         $this->assertEquals('Salary', $result['reason']);
         $this->assertEquals('1000', $result['amount']);
-        $this->assertEquals(75, $result['contribution_percentage']);
+        $this->assertEquals(75, $result['contributionPercentage']);
     }
 
     public function testFindByIdReturnsNullWhenIncomeDoesNotExist(): void
@@ -65,10 +65,10 @@ class IncomeRepositoryTest extends TestCase
         // Verify it was actually created
         $income = $this->repository->findById($incomeId);
         $this->assertNotNull($income);
-        $this->assertEquals($this->memberId, $income['owner_id']);
+        $this->assertEquals($this->memberId, $income['ownerId']);
         $this->assertEquals('Bonus', $income['reason']);
         $this->assertEquals('500.5', $income['amount']);
-        $this->assertEquals(80, $income['contribution_percentage']);
+        $this->assertEquals(80, $income['contributionPercentage']);
     }
 
     public function testUpdateModifiesFields(): void
@@ -80,7 +80,7 @@ class IncomeRepositoryTest extends TestCase
             'reason' => 'Updated Salary',
             'amount' => 1500.00,
             'date' => '2025-02-15',
-            'contribution_percentage' => 85,
+            'contributionPercentage' => 85,
         ]);
         $dto = IncomeDto::createFromRequest($request);
 
@@ -92,7 +92,7 @@ class IncomeRepositoryTest extends TestCase
         $this->assertEquals('Updated Salary', $income['reason']);
         $this->assertEquals('1500', $income['amount']);
         $this->assertEquals('2025-02-15', $income['date']);
-        $this->assertEquals(85, $income['contribution_percentage']);
+        $this->assertEquals(85, $income['contributionPercentage']);
     }
 
     public function testUpdateWithEmptyFieldsReturnsTrue(): void

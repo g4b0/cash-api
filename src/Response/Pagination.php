@@ -25,10 +25,10 @@ namespace App\Response;
  */
 class Pagination extends AppResponse
 {
-    public int $current_page;
-    public int $total_pages;
-    public int $total_items;
-    public int $per_page;
+    public int $currentPage;
+    public int $totalPages;
+    public int $totalItems;
+    public int $perPage;
 
     /**
      * @param int $currentPage Current page number
@@ -42,9 +42,9 @@ class Pagination extends AppResponse
         int $totalItems,
         int $perPage
     ) {
-        $this->current_page = $currentPage;
-        $this->total_pages = $totalPages;
-        $this->total_items = $totalItems;
-        $this->per_page = $perPage;
+        $this->currentPage = $currentPage;
+        $this->totalPages = $totalPages;
+        $this->totalItems = $totalItems;
+        $this->perPage = $perPage;
     }
 }

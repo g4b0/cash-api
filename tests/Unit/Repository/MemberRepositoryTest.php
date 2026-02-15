@@ -29,7 +29,7 @@ class MemberRepositoryTest extends TestCase
         $this->assertEquals($memberId, $result['id']);
         $this->assertEquals('John Doe', $result['name']);
         $this->assertEquals('johndoe', $result['username']);
-        $this->assertEquals(75, $result['contribution_percentage']);
+        $this->assertEquals(75, $result['contributionPercentage']);
     }
 
     public function testFindByIdReturnsNullWhenMemberDoesNotExist(): void
@@ -67,7 +67,7 @@ class MemberRepositoryTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertEquals($memberId, $result['id']);
-        $this->assertEquals($communityId, $result['community_id']);
+        $this->assertEquals($communityId, $result['communityId']);
     }
 
     public function testFindByIdInCommunityReturnsNullWhenMemberBelongsToDifferentCommunity(): void

@@ -36,7 +36,7 @@ class MemberRepository extends Repository
      */
     public function findByIdInCommunity(int $memberId, int $communityId): ?array
     {
-        $stmt = $this->db->prepare('SELECT * FROM member WHERE id = ? AND community_id = ?');
+        $stmt = $this->db->prepare('SELECT * FROM member WHERE id = ? AND communityId = ?');
         $stmt->execute([$memberId, $communityId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -48,7 +48,7 @@ class MemberRepository extends Repository
      */
     public function getContributionPercentage(int $memberId): ?int
     {
-        $stmt = $this->db->prepare('SELECT contribution_percentage FROM member WHERE id = ?');
+        $stmt = $this->db->prepare('SELECT contributionPercentage FROM member WHERE id = ?');
         $stmt->execute([$memberId]);
         $result = $stmt->fetchColumn();
 
@@ -60,7 +60,7 @@ class MemberRepository extends Repository
      */
     public function getCommunityId(int $memberId): ?int
     {
-        $stmt = $this->db->prepare('SELECT community_id FROM member WHERE id = ?');
+        $stmt = $this->db->prepare('SELECT communityId FROM member WHERE id = ?');
         $stmt->execute([$memberId]);
         $result = $stmt->fetchColumn();
 

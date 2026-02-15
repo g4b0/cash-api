@@ -39,15 +39,15 @@ class AuthController extends Controller
 
         $jwtService = new JwtService($this->app->get('jwt_secret'));
 
-        $accessToken = $jwtService->generateAccessToken((int) $member['id'], (int) $member['community_id']);
-        $refreshToken = $jwtService->generateRefreshToken((int) $member['id'], (int) $member['community_id']);
+        $accessToken = $jwtService->generateAccessToken((int) $member['id'], (int) $member['communityId']);
+        $refreshToken = $jwtService->generateRefreshToken((int) $member['id'], (int) $member['communityId']);
 
         $this->json(new TokenPairResponse($accessToken, $refreshToken));
     }
 
     public function refresh(): void
     {
-        $refreshToken = $this->app->request()->data->refresh_token;
+        $refreshToken = $this->app->request()->data->refreshToken;
 
         if (empty($refreshToken)) {
             throw AppException::REFRESH_TOKEN_REQUIRED();

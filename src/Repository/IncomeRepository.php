@@ -31,7 +31,7 @@ class IncomeRepository extends Repository
     public function create(int $ownerId, IncomeDto $dto, int $contributionPercentage): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO income (owner_id, date, reason, amount, contribution_percentage) VALUES (?, ?, ?, ?, ?)'
+            'INSERT INTO income (ownerId, date, reason, amount, contributionPercentage) VALUES (?, ?, ?, ?, ?)'
         );
         $stmt->execute([$ownerId, $dto->date, $dto->reason, $dto->amount, $contributionPercentage]);
 
@@ -49,7 +49,7 @@ class IncomeRepository extends Repository
     public function update(int $id, IncomeDto $dto, int $contributionPercentage): bool
     {
         $stmt = $this->db->prepare(
-            'UPDATE income SET amount = ?, reason = ?, date = ?, contribution_percentage = ? WHERE id = ?'
+            'UPDATE income SET amount = ?, reason = ?, date = ?, contributionPercentage = ? WHERE id = ?'
         );
 
         return $stmt->execute([$dto->amount, $dto->reason, $dto->date, $contributionPercentage, $id]);
@@ -66,7 +66,7 @@ class IncomeRepository extends Repository
 
     /**
      * Calculate total contributions for a member.
-     * Contribution = amount * contribution_percentage / 100
+     * Contribution = amount * contributionPercentage / 100
      *
      * @param int $memberId
      * @return float Total contributions
@@ -74,7 +74,7 @@ class IncomeRepository extends Repository
     public function calculateTotalContributions(int $memberId): float
     {
         $stmt = $this->db->prepare(
-            'SELECT COALESCE(SUM(amount * contribution_percentage / 100.0), 0) FROM income WHERE owner_id = ?'
+            'SELECT COALESCE(SUM(amount * contributionPercentage / 100.0), 0) FROM income WHERE ownerId = ?'
         );
         $stmt->execute([$memberId]);
         return (float) $stmt->fetchColumn();

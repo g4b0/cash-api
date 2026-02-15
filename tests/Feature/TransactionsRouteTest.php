@@ -69,10 +69,10 @@ class TransactionsRouteTest extends TestCase
         $body = json_decode($this->app->response()->getBody(), true);
         $this->assertIsArray($body['transactions']);
         $this->assertEmpty($body['transactions']);
-        $this->assertEquals(1, $body['pagination']['current_page']);
-        $this->assertEquals(0, $body['pagination']['total_pages']);
-        $this->assertEquals(0, $body['pagination']['total_items']);
-        $this->assertEquals(25, $body['pagination']['per_page']);
+        $this->assertEquals(1, $body['pagination']['currentPage']);
+        $this->assertEquals(0, $body['pagination']['totalPages']);
+        $this->assertEquals(0, $body['pagination']['totalItems']);
+        $this->assertEquals(25, $body['pagination']['perPage']);
     }
 
     public function testListReturnsMergedTransactionsSortedByDate(): void
@@ -117,13 +117,13 @@ class TransactionsRouteTest extends TestCase
 
         $body = json_decode($this->app->response()->getBody(), true);
 
-        // Expense should NOT have contribution_percentage field
+        // Expense should NOT have contributionPercentage field
         $this->assertEquals('expense', $body['transactions'][0]['type']);
-        $this->assertArrayNotHasKey('contribution_percentage', $body['transactions'][0]);
+        $this->assertArrayNotHasKey('contributionPercentage', $body['transactions'][0]);
 
         // Income should have contribution_percentage
         $this->assertEquals('income', $body['transactions'][1]['type']);
-        $this->assertEquals(80, $body['transactions'][1]['contribution_percentage']);
+        $this->assertEquals(80, $body['transactions'][1]['contributionPercentage']);
     }
 
     public function testListDefaultsToPageOneWith25Items(): void
@@ -143,10 +143,10 @@ class TransactionsRouteTest extends TestCase
         $body = json_decode($this->app->response()->getBody(), true);
 
         $this->assertCount(25, $body['transactions']); // First page has 25 items
-        $this->assertEquals(1, $body['pagination']['current_page']);
-        $this->assertEquals(2, $body['pagination']['total_pages']);
-        $this->assertEquals(30, $body['pagination']['total_items']);
-        $this->assertEquals(25, $body['pagination']['per_page']);
+        $this->assertEquals(1, $body['pagination']['currentPage']);
+        $this->assertEquals(2, $body['pagination']['totalPages']);
+        $this->assertEquals(30, $body['pagination']['totalItems']);
+        $this->assertEquals(25, $body['pagination']['perPage']);
     }
 
     public function testListReturnsSecondPage(): void
@@ -166,10 +166,10 @@ class TransactionsRouteTest extends TestCase
         $body = json_decode($this->app->response()->getBody(), true);
 
         $this->assertCount(5, $body['transactions']); // Second page has remaining 5 items
-        $this->assertEquals(2, $body['pagination']['current_page']);
-        $this->assertEquals(2, $body['pagination']['total_pages']);
-        $this->assertEquals(30, $body['pagination']['total_items']);
-        $this->assertEquals(25, $body['pagination']['per_page']);
+        $this->assertEquals(2, $body['pagination']['currentPage']);
+        $this->assertEquals(2, $body['pagination']['totalPages']);
+        $this->assertEquals(30, $body['pagination']['totalItems']);
+        $this->assertEquals(25, $body['pagination']['perPage']);
     }
 
     public function testListWithCustomPerPage(): void
@@ -189,10 +189,10 @@ class TransactionsRouteTest extends TestCase
         $body = json_decode($this->app->response()->getBody(), true);
 
         $this->assertCount(10, $body['transactions']);
-        $this->assertEquals(1, $body['pagination']['current_page']);
-        $this->assertEquals(3, $body['pagination']['total_pages']); // 30 items / 10 per page = 3 pages
-        $this->assertEquals(30, $body['pagination']['total_items']);
-        $this->assertEquals(10, $body['pagination']['per_page']);
+        $this->assertEquals(1, $body['pagination']['currentPage']);
+        $this->assertEquals(3, $body['pagination']['totalPages']); // 30 items / 10 per page = 3 pages
+        $this->assertEquals(30, $body['pagination']['totalItems']);
+        $this->assertEquals(10, $body['pagination']['perPage']);
     }
 
     public function testListForMemberInSameCommunityReturns200(): void
@@ -286,8 +286,8 @@ class TransactionsRouteTest extends TestCase
 
         $body = json_decode($this->app->response()->getBody(), true);
         $this->assertEmpty($body['transactions']); // Empty array
-        $this->assertEquals(999, $body['pagination']['current_page']); // Still reflects requested page
-        $this->assertEquals(1, $body['pagination']['total_pages']); // But shows actual total pages
-        $this->assertEquals(5, $body['pagination']['total_items']);
+        $this->assertEquals(999, $body['pagination']['currentPage']); // Still reflects requested page
+        $this->assertEquals(1, $body['pagination']['totalPages']); // But shows actual total pages
+        $this->assertEquals(5, $body['pagination']['totalItems']);
     }
 }

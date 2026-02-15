@@ -92,9 +92,9 @@ class TransactionRepositoryTest extends TestCase
         $result = $this->repository->findPaginatedByMemberId($this->memberId, 25, 0);
 
         // Expense should have null contribution_percentage
-        $this->assertNull($result[0]['contribution_percentage']);
+        $this->assertNull($result[0]['contributionPercentage']);
         // Income should have contribution_percentage
-        $this->assertEquals(80, $result[1]['contribution_percentage']);
+        $this->assertEquals(80, $result[1]['contributionPercentage']);
     }
 
     public function testFindPaginatedByMemberIdRespectsLimitAndOffset(): void

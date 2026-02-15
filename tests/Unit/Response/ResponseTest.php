@@ -53,8 +53,8 @@ class ResponseTest extends TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals([
-            'access_token' => $accessToken,
-            'refresh_token' => $refreshToken,
+            'accessToken' => $accessToken,
+            'refreshToken' => $refreshToken,
         ], $response->toArray());
         $this->assertNull($response->getLocationHeader());
     }

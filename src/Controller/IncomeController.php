@@ -41,7 +41,7 @@ class IncomeController extends Controller
         $dto = IncomeDto::createFromRequest($this->app->request());
 
         // 4. Handle contribution_percentage default
-        $contributionPercentage = $dto->contribution_percentage ?? (int) $member['contribution_percentage'];
+        $contributionPercentage = $dto->contributionPercentage ?? (int) $member['contributionPercentage'];
 
         // 5. Create income record
         $incomeId = $this->incomeRepository->create($ownerId, $dto, $contributionPercentage);
@@ -64,7 +64,7 @@ class IncomeController extends Controller
         }
 
         // 3. Verify community access (fetch owner's community)
-        $ownerCommunityId = $this->memberRepository->getCommunityId((int) $income['owner_id']);
+        $ownerCommunityId = $this->memberRepository->getCommunityId((int) $income['ownerId']);
 
         if ($ownerCommunityId !== $communityId) {
             throw AppException::FORBIDDEN();
@@ -88,7 +88,7 @@ class IncomeController extends Controller
         }
 
         // 3. Verify ownership
-        if ((int) $income['owner_id'] !== $memberId) {
+        if ((int) $income['ownerId'] !== $memberId) {
             throw AppException::FORBIDDEN();
         }
 
@@ -96,7 +96,7 @@ class IncomeController extends Controller
         $dto = IncomeDto::createFromRequest($this->app->request());
 
         // 5. Handle contribution_percentage default
-        $contributionPercentage = $dto->contribution_percentage ?? (int) $income['contribution_percentage'];
+        $contributionPercentage = $dto->contributionPercentage ?? (int) $income['contributionPercentage'];
 
         // 6. Execute update
         $this->incomeRepository->update((int) $id, $dto, $contributionPercentage);
@@ -122,7 +122,7 @@ class IncomeController extends Controller
         }
 
         // 3. Verify ownership
-        if ((int) $income['owner_id'] !== $memberId) {
+        if ((int) $income['ownerId'] !== $memberId) {
             throw AppException::FORBIDDEN();
         }
 

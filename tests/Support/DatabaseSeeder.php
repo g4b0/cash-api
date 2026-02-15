@@ -33,15 +33,15 @@ class DatabaseSeeder
         int $contributionPercentage = 75
     ): int {
         $stmt = $db->prepare(
-            'INSERT INTO member (community_id, name, username, password, contribution_percentage)
-             VALUES (:community_id, :name, :username, :password, :contribution_percentage)'
+            'INSERT INTO member (communityId, name, username, password, contributionPercentage)
+             VALUES (:communityId, :name, :username, :password, :contributionPercentage)'
         );
         $stmt->execute([
-            'community_id' => $communityId,
+            'communityId' => $communityId,
             'name' => $name,
             'username' => $username,
             'password' => password_hash('test', PASSWORD_DEFAULT),
-            'contribution_percentage' => $contributionPercentage,
+            'contributionPercentage' => $contributionPercentage,
         ]);
 
         return (int) $db->lastInsertId();
@@ -56,15 +56,15 @@ class DatabaseSeeder
         int $contributionPercentage
     ): int {
         $stmt = $db->prepare(
-            'INSERT INTO income (owner_id, date, reason, amount, contribution_percentage)
-             VALUES (:owner_id, :date, :reason, :amount, :contribution_percentage)'
+            'INSERT INTO income (ownerId, date, reason, amount, contributionPercentage)
+             VALUES (:ownerId, :date, :reason, :amount, :contributionPercentage)'
         );
         $stmt->execute([
-            'owner_id' => $ownerId,
+            'ownerId' => $ownerId,
             'date' => $date,
             'reason' => $reason,
             'amount' => $amount,
-            'contribution_percentage' => $contributionPercentage,
+            'contributionPercentage' => $contributionPercentage,
         ]);
 
         return (int) $db->lastInsertId();
@@ -78,11 +78,11 @@ class DatabaseSeeder
         float $amount
     ): int {
         $stmt = $db->prepare(
-            'INSERT INTO expense (owner_id, date, reason, amount)
-             VALUES (:owner_id, :date, :reason, :amount)'
+            'INSERT INTO expense (ownerId, date, reason, amount)
+             VALUES (:ownerId, :date, :reason, :amount)'
         );
         $stmt->execute([
-            'owner_id' => $ownerId,
+            'ownerId' => $ownerId,
             'date' => $date,
             'reason' => $reason,
             'amount' => $amount,

@@ -23,14 +23,14 @@ class MemberCommand extends AbstractCommand
 
     private function add(): int
     {
-        $communityId = $this->args['community_id'] ?? null;
+        $communityId = $this->args['communityId'] ?? null;
         $name = $this->args['name'] ?? null;
         $username = $this->args['username'] ?? null;
         $password = $this->args['password'] ?? null;
-        $contributionPercentage = $this->args['contribution_percentage'] ?? 75;
+        $contributionPercentage = $this->args['contributionPercentage'] ?? 75;
 
         if (empty($communityId)) {
-            $this->error("Community ID is required. Use --community_id=123");
+            $this->error("Community ID is required. Use --communityId=123");
             return 1;
         }
 
@@ -52,7 +52,7 @@ class MemberCommand extends AbstractCommand
         try {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $this->db->prepare(
-                'INSERT INTO member (community_id, name, username, password, contribution_percentage) VALUES (?, ?, ?, ?, ?)'
+                'INSERT INTO member (communityId, name, username, password, contributionPercentage) VALUES (?, ?, ?, ?, ?)'
             );
             $stmt->execute([$communityId, $name, $username, $hashedPassword, $contributionPercentage]);
 
@@ -71,7 +71,7 @@ class MemberCommand extends AbstractCommand
         $id = $this->args['id'] ?? null;
         $name = $this->args['name'] ?? null;
         $username = $this->args['username'] ?? null;
-        $contributionPercentage = $this->args['contribution_percentage'] ?? null;
+        $contributionPercentage = $this->args['contributionPercentage'] ?? null;
 
         if (empty($id)) {
             $this->error("Member ID is required. Use --id=123");
@@ -92,12 +92,12 @@ class MemberCommand extends AbstractCommand
         }
 
         if ($contributionPercentage !== null) {
-            $updates[] = 'contribution_percentage = ?';
+            $updates[] = 'contributionPercentage = ?';
             $values[] = $contributionPercentage;
         }
 
         if (empty($updates)) {
-            $this->error("At least one field to update is required (--name, --username, --contribution_percentage)");
+            $this->error("At least one field to update is required (--name, --username, --contributionPercentage)");
             return 1;
         }
 

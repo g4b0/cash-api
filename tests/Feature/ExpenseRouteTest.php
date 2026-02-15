@@ -207,7 +207,7 @@ class ExpenseRouteTest extends TestCase
 
         $body = json_decode($this->app->response()->getBody(), true);
         $this->assertEquals($expenseId, $body['id']);
-        $this->assertEquals($this->memberId, $body['owner_id']);
+        $this->assertEquals($this->memberId, $body['ownerId']);
         $this->assertEquals('Groceries', $body['reason']);
     }
 

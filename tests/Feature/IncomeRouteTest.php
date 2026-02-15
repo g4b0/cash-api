@@ -77,7 +77,7 @@ class IncomeRouteTest extends TestCase
             'amount' => 1000.50,
             'reason' => 'Salary',
             'date' => '2025-02-14',
-            'contribution_percentage' => 80,
+            'contributionPercentage' => 80,
         ]);
 
         $this->app->start();
@@ -246,7 +246,7 @@ class IncomeRouteTest extends TestCase
 
         $body = json_decode($this->app->response()->getBody(), true);
         $this->assertEquals($incomeId, $body['id']);
-        $this->assertEquals($this->memberId, $body['owner_id']);
+        $this->assertEquals($this->memberId, $body['ownerId']);
         $this->assertEquals('Salary', $body['reason']);
     }
 
@@ -325,7 +325,7 @@ class IncomeRouteTest extends TestCase
             'amount' => 1500,
             'reason' => 'Updated Salary',
             'date' => '2025-02-15',
-            'contribution_percentage' => 85,
+            'contributionPercentage' => 85,
         ]);
 
         $this->app->start();
@@ -336,7 +336,7 @@ class IncomeRouteTest extends TestCase
         $this->assertEquals('1500', $body['amount']);
         $this->assertEquals('Updated Salary', $body['reason']);
         $this->assertEquals('2025-02-15', $body['date']);
-        $this->assertEquals(85, $body['contribution_percentage']);
+        $this->assertEquals(85, $body['contributionPercentage']);
     }
 
     public function testUpdateIncomeReasonOnly(): void
@@ -419,7 +419,7 @@ class IncomeRouteTest extends TestCase
             'amount' => 1000,
             'reason' => 'Salary',
             'date' => '2025-02-14',
-            'contribution_percentage' => 90,
+            'contributionPercentage' => 90,
         ]);
 
         $this->app->start();
@@ -427,7 +427,7 @@ class IncomeRouteTest extends TestCase
         $this->assertEquals(200, $this->app->response()->status());
 
         $body = json_decode($this->app->response()->getBody(), true);
-        $this->assertEquals(90, $body['contribution_percentage']);
+        $this->assertEquals(90, $body['contributionPercentage']);
     }
 
     public function testUpdateOthersIncomeReturns403(): void

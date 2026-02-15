@@ -22,7 +22,7 @@ class IncomeDtoTest extends TestCase
             'amount' => 1500.50,
             'reason' => 'Monthly salary',
             'date' => '2025-02-15',
-            'contribution_percentage' => 75
+            'contributionPercentage' => 75
         ]);
 
         $dto = IncomeDto::createFromRequest($request);
@@ -30,7 +30,7 @@ class IncomeDtoTest extends TestCase
         $this->assertSame(1500.50, $dto->amount);
         $this->assertSame('Monthly salary', $dto->reason);
         $this->assertSame('2025-02-15', $dto->date);
-        $this->assertSame(75, $dto->contribution_percentage);
+        $this->assertSame(75, $dto->contributionPercentage);
     }
 
     public function testCreateFromRequestWithMinimalData(): void
@@ -45,7 +45,7 @@ class IncomeDtoTest extends TestCase
         $this->assertSame(100.0, $dto->amount);
         $this->assertSame('Bonus', $dto->reason);
         $this->assertSame(date('Y-m-d'), $dto->date);  // Defaults to today
-        $this->assertNull($dto->contribution_percentage);  // Optional
+        $this->assertNull($dto->contributionPercentage);  // Optional
     }
 
     public function testCreateFromRequestWithMissingAmountThrowsException(): void
@@ -133,7 +133,7 @@ class IncomeDtoTest extends TestCase
         $request = $this->createRequest([
             'amount' => 100,
             'reason' => 'Test',
-            'contribution_percentage' => 101
+            'contributionPercentage' => 101
         ]);
 
         IncomeDto::createFromRequest($request);
@@ -169,12 +169,12 @@ class IncomeDtoTest extends TestCase
         $request = $this->createRequest([
             'amount' => 100,
             'reason' => 'Test',
-            'contribution_percentage' => '85'
+            'contributionPercentage' => '85'
         ]);
 
         $dto = IncomeDto::createFromRequest($request);
 
-        $this->assertSame(85, $dto->contribution_percentage);
-        $this->assertIsInt($dto->contribution_percentage);
+        $this->assertSame(85, $dto->contributionPercentage);
+        $this->assertIsInt($dto->contributionPercentage);
     }
 }

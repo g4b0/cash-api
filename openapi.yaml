@@ -51,11 +51,11 @@ paths:
               schema:
                 type: object
                 properties:
-                  access_token:
+                  accessToken:
                     type: string
                     description: JWT access token (1 hour expiry)
                     example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
-                  refresh_token:
+                  refreshToken:
                     type: string
                     description: JWT refresh token (7 days expiry)
                     example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
@@ -85,9 +85,9 @@ paths:
             schema:
               type: object
               required:
-                - refresh_token
+                - refreshToken
               properties:
-                refresh_token:
+                refreshToken:
                   type: string
                   description: Valid refresh token
                   example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
@@ -99,10 +99,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  access_token:
+                  accessToken:
                     type: string
                     description: New JWT access token
-                  refresh_token:
+                  refreshToken:
                     type: string
                     description: New JWT refresh token
         '400':
@@ -118,7 +118,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /balance/{community_id}/{member_id}:
+  /balance/{communityId}/{member_id}:
     get:
       tags:
         - Dashboard
@@ -127,7 +127,7 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - name: community_id
+        - name: communityId
           in: path
           required: true
           schema:
@@ -173,7 +173,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /transactions/{community_id}/{member_id}:
+  /transactions/{communityId}/{member_id}:
     get:
       tags:
         - Dashboard
@@ -182,7 +182,7 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - name: community_id
+        - name: communityId
           in: path
           required: true
           schema:
@@ -245,32 +245,32 @@ paths:
                         amount:
                           type: string
                           example: "1000.50"
-                        contribution_percentage:
+                        contributionPercentage:
                           type: integer
                           nullable: true
                           description: Only present for income records
                           example: 75
-                        created_at:
+                        createdAt:
                           type: string
                           format: date-time
                           example: "2025-02-14 10:00:00"
-                        updated_at:
+                        updatedAt:
                           type: string
                           format: date-time
                           example: "2025-02-14 10:00:00"
                   pagination:
                     type: object
                     properties:
-                      current_page:
+                      currentPage:
                         type: integer
                         example: 1
-                      total_pages:
+                      totalPages:
                         type: integer
                         example: 3
-                      total_items:
+                      totalItems:
                         type: integer
                         example: 67
-                      per_page:
+                      perPage:
                         type: integer
                         example: 25
         '400':
@@ -332,7 +332,7 @@ paths:
                   format: date
                   description: Income date (defaults to today if not provided)
                   example: '2025-02-14'
-                contribution_percentage:
+                contributionPercentage:
                   type: integer
                   minimum: 0
                   maximum: 100
@@ -459,7 +459,7 @@ paths:
                   format: date
                   description: Income date
                   example: '2025-02-15'
-                contribution_percentage:
+                contributionPercentage:
                   type: integer
                   minimum: 0
                   maximum: 100
@@ -781,7 +781,7 @@ components:
         id:
           type: integer
           example: 1
-        owner_id:
+        ownerId:
           type: integer
           description: Member ID who owns this income
           example: 1
@@ -796,15 +796,15 @@ components:
           type: string
           description: Amount as decimal string
           example: '1000.50'
-        contribution_percentage:
+        contributionPercentage:
           type: integer
           description: Percentage contributed to common account
           example: 80
-        created_at:
+        createdAt:
           type: string
           format: date-time
           example: '2025-02-14 10:30:00'
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           example: '2025-02-14 10:30:00'
@@ -815,7 +815,7 @@ components:
         id:
           type: integer
           example: 1
-        owner_id:
+        ownerId:
           type: integer
           description: Member ID who owns this expense
           example: 1
@@ -830,11 +830,11 @@ components:
           type: string
           description: Amount as decimal string
           example: '500.75'
-        created_at:
+        createdAt:
           type: string
           format: date-time
           example: '2025-02-14 10:30:00'
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           example: '2025-02-14 10:30:00'

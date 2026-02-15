@@ -121,6 +121,15 @@ public function update(int $id, IncomeUpdateDto $dto): bool
 
 Input validation for POST/PUT endpoints uses Data Transfer Objects (DTOs).
 
+**Naming Convention**:
+- **Uniform camelCase**: All property names, JSON keys, and database columns use camelCase
+- **DTO properties**: camelCase (`contributionPercentage`, `ownerId`)
+- **API input/output**: camelCase (`contributionPercentage`, `ownerId`)
+- **Database columns**: camelCase (`contributionPercentage`, `ownerId`)
+- **Response properties**: camelCase (`contributionPercentage`, `ownerId`)
+
+This provides consistency across the entire stack - from database to API to client code.
+
 **Location**: `src/Dto/`
 
 **Naming**: `{Entity}Dto` (e.g., `IncomeDto`, `ExpenseDto`)
@@ -129,17 +138,27 @@ Input validation for POST/PUT endpoints uses Data Transfer Objects (DTOs).
 ```php
 class IncomeDto extends Dto
 {
-    public float $amount;           // Type-hinted properties (all required)
+    public float $amount;                      // Type-hinted properties (all required)
     public string $reason;
     public string $date;
-    public ?int $contribution_percentage;
+    public ?int $contributionPercentage;       // camelCase property names
 
     public static function createFromRequest(Request $request): self
     {
-        // Extract data, validate, return DTO instance
-        // All fields mandatory except contribution_percentage
+        // Extract data from snake_case input, validate, return DTO instance
+        // All fields mandatory except contributionPercentage
+        $dto->contributionPercentage = $validator->validateContributionPercentage(
+            $data->contribution_percentage ?? null  // Input uses snake_case
+        );
     }
 }
+```
+
+**Example:**
+```php
+// Client sends: {"amount": 1500, "reason": "Salary", "date": "2025-02-15", "contributionPercentage": 75}
+$dto = IncomeDto::createFromRequest($this->app->request());
+// DTO has: $dto->contributionPercentage (camelCase property)
 ```
 
 **Usage in Controllers**:
@@ -147,22 +166,19 @@ class IncomeDto extends Dto
 *Create (POST):*
 ```php
 $dto = IncomeDto::createFromRequest($this->app->request());
-// Use $dto->amount, $dto->reason, etc. (type-safe, validated)
-$contributionPercentage = $dto->contribution_percentage ?? $member['contribution_percentage'];
+// Use $dto->amount, $dto->reason, etc. (type-safe, validated, camelCase)
+$contributionPercentage = $dto->contributionPercentage ?? $member['contribution_percentage'];
 $incomeId = $this->incomeRepository->create($ownerId, $dto, $contributionPercentage);
 
-// Set Location header per RFC 9110
-$this->app->response()->header('Location', "/income/$incomeId");
-
-// Return 201 with resource identifier
-$this->json(['id' => $incomeId], 201);
+// Return 201 Created with resource identifier
+$this->json(new CreatedResourceResponse($incomeId, 'income'));
 ```
 
 *Update (PUT):*
 ```php
 $dto = IncomeDto::createFromRequest($this->app->request());
 // PUT requires all fields (full replacement, not partial update)
-$contributionPercentage = $dto->contribution_percentage ?? $income['contribution_percentage'];
+$contributionPercentage = $dto->contributionPercentage ?? $income['contribution_percentage'];
 $this->incomeRepository->update($id, $dto, $contributionPercentage);
 ```
 
@@ -201,70 +217,67 @@ Output formatting uses Response classes for type safety and consistency.
 
 **Base Class**: All response classes extend `AppResponse` (abstract base) which implements `JsonSerializable`
 
-**Specialized Responses** — Type-safe response objects with proper inheritance:
+**Property Naming Convention**:
+- **Response properties**: camelCase (`ownerId`, `createdAt`, `contributionPercentage`)
+- **Database columns**: camelCase (`ownerId`, `createdAt`, `contributionPercentage`)
+- **JSON output**: camelCase (via reflection-based serialization)
+
+**Composable Responses** — Type-safe response objects with reflection-based serialization:
 
 ```php
 // Abstract base for shared money flow fields
 abstract class MoneyFlowResponse extends AppResponse
 {
     public int $id;
-    public int $ownerId;
+    public int $ownerId;              // camelCase property
     public \DateTime $date;
     public string $reason;
-    public float $amount;
-    public \DateTime $createdAt;
-    public \DateTime $updatedAt;
+    public string $amount;             // stored as string for JSON precision
+    public \DateTime $createdAt;      // camelCase property
+    public \DateTime $updatedAt;      // camelCase property
 
     public function __construct(array $data)
     {
         $this->id = (int) $data['id'];
-        $this->ownerId = (int) $data['owner_id'];
+        $this->ownerId = (int) $data['ownerId'];        // DB uses camelCase
         $this->date = new \DateTime($data['date']);
         $this->reason = $data['reason'];
-        $this->amount = (float) $data['amount'];
-        $this->createdAt = new \DateTime($data['created_at']);
-        $this->updatedAt = new \DateTime($data['updated_at']);
+        $this->amount = (string) $data['amount'];
+        $this->createdAt = new \DateTime($data['createdAt']);
+        $this->updatedAt = new \DateTime($data['updatedAt']);
     }
 
-    public function toArray(): array
-    {
-        return [
-            'id' => $this->id,
-            'owner_id' => $this->ownerId,
-            'date' => $this->date->format('Y-m-d'),
-            'reason' => $this->reason,
-            'amount' => (string) $this->amount,
-            'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
-        ];
-    }
+    // No toArray() needed - AppResponse uses reflection to auto-serialize public properties
 }
 
 // Income-specific response extending shared base
 class IncomeResponse extends MoneyFlowResponse
 {
-    public int $contributionPercentage;
+    public string $type = 'income';
+    public ?string $contributionPercentage;  // camelCase property
 
     public function __construct(array $data)
     {
         parent::__construct($data);
-        $this->contributionPercentage = (int) $data['contribution_percentage'];
-    }
-
-    public function toArray(): array
-    {
-        return array_merge(parent::toArray(), [
-            'contribution_percentage' => (string) $this->contributionPercentage,
-        ]);
+        $this->contributionPercentage = $data['contributionPercentage'] !== null
+            ? (string) $data['contributionPercentage']
+            : null;
     }
 }
 
 // Expense-specific response (inherits all from MoneyFlowResponse)
 class ExpenseResponse extends MoneyFlowResponse
 {
-    // No additional fields needed
+    public string $type = 'expense';
+    // No contributionPercentage property - not applicable to expenses
 }
 ```
+
+**Automatic Serialization**:
+- Public properties are automatically serialized by `AppResponse::toArray()` using reflection
+- Property names become JSON keys directly (camelCase → camelCase)
+- DateTime objects automatically formatted (Y-m-d or Y-m-d H:i:s)
+- Nested Response objects recursively converted
 
 **Usage in Controllers**:
 
@@ -284,11 +297,12 @@ $this->json(new ExpenseResponse($expense));
 ```
 
 **Benefits**:
-- Type-safe property access (`$response->amount` is guaranteed float)
+- Type-safe property access with camelCase naming (`$response->ownerId`)
 - DateTime objects for proper date handling (not raw strings)
-- Centralized formatting logic (amount as string, date formats)
+- Automatic serialization via reflection (no manual toArray() needed)
+- Composable: responses can contain other Response objects
 - Inheritance reduces duplication (MoneyFlowResponse shared by Income and Expense)
-- Prevents heterogeneous array bugs (typed properties enforce structure)
+- Consistent naming: camelCase in PHP, camelCase in JSON output
 - Self-documenting code (`IncomeResponse` vs. raw array)
 
 **Response Classes**:

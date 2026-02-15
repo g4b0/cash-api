@@ -44,11 +44,11 @@ class MemberCommandTest extends TestCase
     {
         $command = new MemberCommand($this->db, [
             'action' => 'add',
-            'community_id' => $this->communityId,
+            'communityId' => $this->communityId,
             'name' => 'John Doe',
             'username' => 'johndoe',
             'password' => 'secret123',
-            'contribution_percentage' => 80,
+            'contributionPercentage' => 80,
         ], $this->stdout, $this->stderr);
 
         $exitCode = $command->execute();
@@ -63,7 +63,7 @@ class MemberCommandTest extends TestCase
         $this->assertNotFalse($member);
         $this->assertEquals('John Doe', $member['name']);
         $this->assertEquals('johndoe', $member['username']);
-        $this->assertEquals(80, $member['contribution_percentage']);
+        $this->assertEquals(80, $member['contributionPercentage']);
         $this->assertTrue(password_verify('secret123', $member['password']));
     }
 
@@ -71,7 +71,7 @@ class MemberCommandTest extends TestCase
     {
         $command = new MemberCommand($this->db, [
             'action' => 'add',
-            'community_id' => $this->communityId,
+            'communityId' => $this->communityId,
             'name' => 'Jane Doe',
             'username' => 'janedoe',
             'password' => 'secret456',
@@ -81,7 +81,7 @@ class MemberCommandTest extends TestCase
 
         $this->assertEquals(0, $exitCode);
 
-        $stmt = $this->db->query('SELECT contribution_percentage FROM member WHERE username = "janedoe"');
+        $stmt = $this->db->query('SELECT contributionPercentage FROM member WHERE username = "janedoe"');
         $contributionPercentage = $stmt->fetchColumn();
 
         $this->assertEquals(75, $contributionPercentage);
