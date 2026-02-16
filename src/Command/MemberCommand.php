@@ -71,6 +71,7 @@ class MemberCommand extends AbstractCommand
         $id = $this->args['id'] ?? null;
         $name = $this->args['name'] ?? null;
         $username = $this->args['username'] ?? null;
+        $password = $this->args['password'] ?? null;
         $contributionPercentage = $this->args['contributionPercentage'] ?? null;
 
         if (empty($id)) {
@@ -91,13 +92,18 @@ class MemberCommand extends AbstractCommand
             $values[] = $username;
         }
 
+        if (!empty($password)) {
+            $updates[] = 'password = ?';
+            $values[] = password_hash($password, PASSWORD_DEFAULT);
+        }
+
         if ($contributionPercentage !== null) {
             $updates[] = 'contributionPercentage = ?';
             $values[] = $contributionPercentage;
         }
 
         if (empty($updates)) {
-            $this->error("At least one field to update is required (--name, --username, --contributionPercentage)");
+            $this->error("At least one field to update is required (--name, --username, --password, --contributionPercentage)");
             return 1;
         }
 

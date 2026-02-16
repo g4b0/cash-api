@@ -255,6 +255,7 @@ All fields are optional in PATCH requests - only provided fields will be updated
 # Update a member (any combination of fields)
 ./bin/member update --id=1 --name="Jane Doe"
 ./bin/member update --id=1 --contributionPercentage=90
+./bin/member update --id=1 --password=newpassword
 ./bin/member update --id=1 --username=newusername --name="New Name"
 
 # Delete a member

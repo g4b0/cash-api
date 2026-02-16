@@ -124,4 +124,40 @@ class MemberCommandTest extends TestCase
 
         $this->assertEquals(0, $count);
     }
+
+    public function testUpdateMemberPassword(): void
+    {
+        // Seed a member with initial password
+        $memberId = DatabaseSeeder::seedMember($this->db, $this->communityId, 'Test User', 'testuser', 75);
+
+        // Get initial password hash
+        $stmt = $this->db->prepare('SELECT password FROM member WHERE id = ?');
+        $stmt->execute([$memberId]);
+        $initialPasswordHash = $stmt->fetchColumn();
+
+        // Update password
+        $command = new MemberCommand($this->db, [
+            'action' => 'update',
+            'id' => $memberId,
+            'password' => 'newpassword123',
+        ], $this->stdout, $this->stderr);
+
+        $exitCode = $command->execute();
+        $output = $this->getOutput();
+
+        $this->assertEquals(0, $exitCode);
+        $this->assertStringContainsString("Member $memberId updated successfully", $output);
+
+        // Verify password was updated
+        $stmt = $this->db->prepare('SELECT password FROM member WHERE id = ?');
+        $stmt->execute([$memberId]);
+        $newPasswordHash = $stmt->fetchColumn();
+
+        // Password hash should have changed
+        $this->assertNotEquals($initialPasswordHash, $newPasswordHash);
+        // New password should verify correctly
+        $this->assertTrue(password_verify('newpassword123', $newPasswordHash));
+        // Old password should not work
+        $this->assertFalse(password_verify('test', $newPasswordHash));
+    }
 }
