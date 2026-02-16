@@ -195,6 +195,29 @@ class TransactionsRouteTest extends TestCase
         $this->assertEquals(10, $body['pagination']['perPage']);
     }
 
+    public function testListWithPerPage15ReturnsCorrectPaginationMetadata(): void
+    {
+        // Seed 30 transactions
+        for ($i = 1; $i <= 30; $i++) {
+            DatabaseSeeder::seedIncome($this->db, $this->memberId, '2025-02-14', "Income $i", 100.00, 75);
+        }
+
+        $this->authenticateAs($this->memberId, $this->communityId);
+
+        $this->app->request()->url = "/transactions/{$this->communityId}/{$this->memberId}/15";
+        $this->app->request()->method = 'GET';
+
+        $this->app->start();
+
+        $body = json_decode($this->app->response()->getBody(), true);
+
+        $this->assertCount(15, $body['transactions']);
+        $this->assertEquals(1, $body['pagination']['currentPage']);
+        $this->assertEquals(2, $body['pagination']['totalPages']); // 30 items / 15 per page = 2 pages
+        $this->assertEquals(30, $body['pagination']['totalItems']);
+        $this->assertEquals(15, $body['pagination']['perPage']); // Bug: this might be showing 25
+    }
+
     public function testListForMemberInSameCommunityReturns200(): void
     {
         $member2Id = DatabaseSeeder::seedMember($this->db, $this->communityId, 'Member 2', 'member2', 80);
