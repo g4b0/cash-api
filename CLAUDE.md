@@ -14,22 +14,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## PHP Environment
 
-- Always use `php7.4` as the PHP executable when running Composer or any PHP CLI command.
-- Example: `php7.4 /usr/local/bin/composer install` instead of `composer install`.
+- Use `php` as the PHP executable when running Composer or any PHP CLI command. Supports PHP 7.4–8.5.
+- Example: `php /usr/local/bin/composer install` instead of `composer install`.
 
 ## Common Commands
 
 ```bash
 # Install dependencies
-php7.4 /usr/local/bin/composer install
+php /usr/local/bin/composer install
 
 # Start PHP built-in dev server (typical Flight setup)
-php7.4 -S localhost:8000
+php -S localhost:8000
 
 # Run tests (once configured)
-php7.4 /usr/local/bin/composer test
+php /usr/local/bin/composer test
 # or
-php7.4 ./vendor/bin/phpunit
+php ./vendor/bin/phpunit
 ```
 
 ## Architecture

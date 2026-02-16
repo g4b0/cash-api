@@ -22,7 +22,7 @@ A backend REST API for managing shared finances in small communities (e.g., fami
 
 ## Tech Stack
 
-- **PHP 7.4**
+- **PHP 7.4–8.5**
 - **Flight PHP v3** (micro-framework)
 - **SQLite** (database)
 - **firebase/php-jwt** (JWT authentication)
@@ -32,20 +32,20 @@ A backend REST API for managing shared finances in small communities (e.g., fami
 
 ```bash
 # Install dependencies
-php7.4 /usr/local/bin/composer install
+php /usr/local/bin/composer install
 ```
 
 ## Database Initialization
 
 ```bash
 # Initialize the database (creates database/cash.db from schema)
-php7.4 database/init_db.php
+php database/init_db.php
 ```
 
 **Note:** The init script refuses to run if `database/cash.db` already exists. Delete it first to reinitialize:
 
 ```bash
-rm database/cash.db && php7.4 database/init_db.php
+rm database/cash.db && php database/init_db.php
 ```
 
 ### Database Schema
@@ -59,7 +59,7 @@ rm database/cash.db && php7.4 database/init_db.php
 
 ```bash
 # Start the PHP built-in development server
-php7.4 -S localhost:8000
+php -S localhost:8000
 ```
 
 ## API Endpoints
@@ -271,17 +271,17 @@ All fields are optional in PATCH requests - only provided fields will be updated
 
 ```bash
 # Run all tests (may show "risky test" warnings - these are harmless)
-php7.4 ./vendor/bin/phpunit
+php ./vendor/bin/phpunit
 
 # Run with clean output (no risky warnings)
-php7.4 ./vendor/bin/phpunit --dont-report-useless-tests
+php ./vendor/bin/phpunit --dont-report-useless-tests
 
 # Run with verbose output
-php7.4 ./vendor/bin/phpunit --testdox
+php ./vendor/bin/phpunit --testdox
 
 # Run specific test suite
-php7.4 ./vendor/bin/phpunit tests/Feature/
-php7.4 ./vendor/bin/phpunit tests/Unit/
+php ./vendor/bin/phpunit tests/Feature/
+php ./vendor/bin/phpunit tests/Unit/
 ```
 
 **Note on "risky test" warnings**: Flight PHP's output buffering can cause PHPUnit to report tests as "risky". This is expected behavior and doesn't affect test correctness or application functionality. The warnings are suppressed with `--dont-report-useless-tests` or by the `phpunit.xml` configuration (tests won't fail, warnings just display).
@@ -292,30 +292,30 @@ php7.4 ./vendor/bin/phpunit tests/Unit/
 
 ```bash
 # Install Xdebug for PHP 7.4
-sudo apt-get install php7.4-xdebug
+sudo apt-get install php-xdebug
 
 # Verify installation
-php7.4 -m | grep xdebug
+php -m | grep xdebug
 ```
 
 Generate coverage reports locally:
 
 ```bash
 # Generate HTML and Clover reports (XDEBUG_MODE=coverage is set automatically)
-php7.4 /usr/local/bin/composer test:coverage
+php /usr/local/bin/composer test:coverage
 
 # View HTML coverage report in browser
 open tests/coverage/html/index.html
 
 # Quick text summary in terminal
-php7.4 /usr/local/bin/composer test:coverage:text
+php /usr/local/bin/composer test:coverage:text
 ```
 
 **Alternative**: Run PHPUnit directly with Xdebug mode:
 
 ```bash
 # Set XDEBUG_MODE and run PHPUnit manually
-XDEBUG_MODE=coverage php7.4 vendor/bin/phpunit --coverage-html tests/coverage/html --coverage-clover tests/coverage/clover.xml
+XDEBUG_MODE=coverage php vendor/bin/phpunit --coverage-html tests/coverage/html --coverage-clover tests/coverage/clover.xml
 ```
 
 **Coverage Reports:**
