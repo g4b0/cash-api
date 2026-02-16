@@ -2,7 +2,7 @@
 
 A backend REST API for managing shared finances in small communities (e.g., families). Each member contributes a percentage of their income to a common account based on their earnings relative to the community's median income — higher earners contribute more.
 
-**🤖 This entire codebase was written by AI. Zero lines of code were written by humans.**
+**🤖 A great part of this codebase was written by AI. Few lines of code were written by humans.**
 
 [![Tests](https://github.com/USERNAME/cash/actions/workflows/tests.yml/badge.svg)](https://github.com/USERNAME/cash/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/USERNAME/cash/branch/master/graph/badge.svg)](https://codecov.io/gh/USERNAME/cash)
@@ -461,4 +461,4 @@ This project was created as an AI demonstration. Use at your own discretion.
 
 ---
 
-**Generated entirely by Claude Opus 4.6 and Claude Sonnet 4.5** 🤖✨
+**Generated with the great help of Claude Opus 4.6 and Claude Sonnet 4.5** 🤖✨
