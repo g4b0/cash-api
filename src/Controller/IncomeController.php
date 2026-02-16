@@ -25,28 +25,21 @@ class IncomeController extends Controller
 
     public function create(): void
     {
-        // 1. Get authenticated user
+        // 1. Get authenticated user (JWT is signed and trusted)
         $authUser = $this->getAuthUser();
         $memberId = (int) $authUser->sub;
-        $communityId = (int) $authUser->cid;
 
-        // 2. Verify member exists and belongs to community
-        $member = $this->memberRepository->findByIdInCommunity($memberId, $communityId);
-
-        if (!$member) {
-            throw AppException::FORBIDDEN();
-        }
-
-        // 3. Validate input via DTO
+        // 2. Validate input via DTO
         $dto = IncomeDto::createFromRequest($this->app->request());
 
-        // 4. Handle contribution_percentage default
-        $contributionPercentage = $dto->contributionPercentage ?? (int) $member['contributionPercentage'];
+        // 3. Handle contribution_percentage default (fetch only if needed)
+        $contributionPercentage = $dto->contributionPercentage
+            ?? $this->memberRepository->getContributionPercentage($memberId);
 
-        // 5. Create income record
+        // 4. Create income record
         $incomeId = $this->incomeRepository->create($memberId, $dto, $contributionPercentage);
 
-        // 6. Return 201 Created with resource identifier (Location header set automatically)
+        // 5. Return 201 Created with resource identifier (Location header set automatically)
         $this->json(new CreatedResourceResponse($incomeId, 'income'));
     }
 

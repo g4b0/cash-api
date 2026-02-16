@@ -25,25 +25,17 @@ class ExpenseController extends Controller
 
     public function create(): void
     {
-        // 1. Get authenticated user
+        // 1. Get authenticated user (JWT is signed and trusted)
         $authUser = $this->getAuthUser();
         $memberId = (int) $authUser->sub;
-        $communityId = (int) $authUser->cid;
 
-        // 2. Verify member exists and belongs to community
-        $member = $this->memberRepository->findByIdInCommunity($memberId, $communityId);
-
-        if (!$member) {
-            throw AppException::FORBIDDEN();
-        }
-
-        // 3. Validate input via DTO
+        // 2. Validate input via DTO
         $dto = ExpenseDto::createFromRequest($this->app->request());
 
-        // 4. Create expense record
+        // 3. Create expense record
         $expenseId = $this->expenseRepository->create($memberId, $dto);
 
-        // 5. Return 201 Created with resource identifier (Location header set automatically)
+        // 4. Return 201 Created with resource identifier (Location header set automatically)
         $this->json(new CreatedResourceResponse($expenseId, 'expense'));
     }
 

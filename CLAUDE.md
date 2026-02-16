@@ -70,6 +70,75 @@ The codebase follows a three-layer architecture for separation of concerns:
 Request → Controller (auth/validation) → Service (business logic) → Repository (data access) → Database
 ```
 
+### JWT Authentication & Trust
+
+The application uses JWT (JSON Web Tokens) for authentication, signed with a private key via HS256 algorithm.
+
+**JWT Claims:**
+- `sub` (subject): Member ID
+- `cid` (custom): Community ID
+- `type`: Token type (`access` or `refresh`)
+- `iat`: Issued at timestamp
+- `exp`: Expiration timestamp
+
+**Trust Model:**
+
+Since JWTs are cryptographically signed with our private key, **we can trust all data inside a valid JWT**. If the JWT signature is valid, we are guaranteed that:
+
+1. The member exists (sub)
+2. The member belongs to the specified community (cid)
+3. The token was issued by our application
+4. The token has not been tampered with
+
+**Performance Optimization:**
+
+Because we trust JWT data, **controllers should NOT verify member existence or community membership** for the authenticated user. This eliminates unnecessary database queries.
+
+**DO NOT** (redundant):
+```php
+// ❌ BAD: Unnecessary query to verify what JWT already guarantees
+$authUser = $this->getAuthUser();
+$memberId = (int) $authUser->sub;
+$member = $this->memberRepository->findByIdInCommunity($memberId, $communityId);
+if (!$member) {
+    throw AppException::FORBIDDEN();
+}
+```
+
+**DO** (optimized):
+```php
+// ✅ GOOD: Trust JWT, use member ID directly
+$authUser = $this->getAuthUser();
+$memberId = (int) $authUser->sub;
+// Proceed with business logic - member is guaranteed to exist
+```
+
+**When Queries ARE Still Needed:**
+
+1. **Fetching member-specific data**: When you need member properties not in the JWT (e.g., `contributionPercentage`)
+   ```php
+   $contributionPercentage = $this->memberRepository->getContributionPercentage($memberId);
+   ```
+
+2. **Authorizing access to other members' data**: When checking if a different member (not the authenticated user) exists and belongs to the same community
+   ```php
+   // User wants to view member #5's data - verify member #5 exists and is in same community
+   $targetMemberCommunityId = $this->memberRepository->getCommunityId($targetMemberId);
+   if ($targetMemberCommunityId !== $authUser->cid) {
+       throw AppException::FORBIDDEN();
+   }
+   ```
+
+3. **Verifying resource ownership**: When checking if the authenticated user owns a specific resource
+   ```php
+   $income = $this->incomeRepository->findById($id);
+   if ((int) $income['memberId'] !== $memberId) {
+       throw AppException::FORBIDDEN();  // Not the owner
+   }
+   ```
+
+**Key Principle**: Trust the JWT for authentication, use database queries only for authorization and business data retrieval.
+
 ### Repository Pattern
 
 All database queries are isolated in repository classes. Controllers and services never execute PDO queries directly.
