@@ -4,6 +4,9 @@ A backend REST API for managing shared finances in small communities (e.g., fami
 
 **🤖 This entire codebase was written by AI. Zero lines of code were written by humans.**
 
+[![Tests](https://github.com/USERNAME/cash/actions/workflows/tests.yml/badge.svg)](https://github.com/USERNAME/cash/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/USERNAME/cash/branch/master/graph/badge.svg)](https://codecov.io/gh/USERNAME/cash)
+
 ## Features
 
 - **JWT Authentication**: Secure login with access and refresh tokens
@@ -282,6 +285,28 @@ php7.4 ./vendor/bin/phpunit tests/Unit/
 ```
 
 **Note on "risky test" warnings**: Flight PHP's output buffering can cause PHPUnit to report tests as "risky". This is expected behavior and doesn't affect test correctness or application functionality. The warnings are suppressed with `--dont-report-useless-tests` or by the `phpunit.xml` configuration (tests won't fail, warnings just display).
+
+## Code Coverage
+
+Generate coverage reports locally:
+
+```bash
+# Generate HTML and Clover reports
+php7.4 /usr/local/bin/composer test:coverage
+
+# View HTML coverage report in browser
+open tests/coverage/html/index.html
+
+# Quick text summary in terminal
+php7.4 /usr/local/bin/composer test:coverage:text
+```
+
+**Coverage Reports:**
+- **HTML Report**: `tests/coverage/html/index.html` - Interactive, visual coverage browser
+- **Clover XML**: `tests/coverage/clover.xml` - Machine-readable format for CI/CD
+- **Text Output**: Terminal summary of coverage percentages
+
+**GitHub Integration**: When published, coverage is automatically tracked via Codecov.io. Coverage badges and PR comments show coverage trends.
 
 ## Project Structure
 

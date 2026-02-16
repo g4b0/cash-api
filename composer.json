@@ -22,5 +22,10 @@
         "psr-4": {
             "Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html tests/coverage/html --coverage-clover tests/coverage/clover.xml",
+        "test:coverage:text": "phpunit --coverage-text"
     }
 }
