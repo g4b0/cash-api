@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Dto\IncomeDto;
+use App\Http\Dto\IncomeDto;
 use PDO;
 
 class IncomeRepository extends Repository

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Controller;
+namespace App\Http\Controller;
 
-use App\Dto\IncomeDto;
 use App\Exception\AppException;
+use App\Http\Dto\IncomeDto;
+use App\Http\Response\Crud\CreatedResourceResponse;
+use App\Http\Response\Crud\NoContentResponse;
+use App\Http\Response\IncomeResponse;
 use App\Repository\IncomeRepository;
 use App\Repository\MemberRepository;
-use App\Response\CreatedResourceResponse;
-use App\Response\IncomeResponse;
-use App\Response\NoContentResponse;
 use flight\Engine;
 
 class IncomeController extends Controller

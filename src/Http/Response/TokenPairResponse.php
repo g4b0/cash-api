@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Response;
+namespace App\Http\Response;
 
 /**
  * Response for authentication endpoints that return JWT tokens.

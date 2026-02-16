@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Repository;
 
-use App\Dto\IncomeDto;
+use App\Http\Dto\IncomeDto;
 use App\Repository\IncomeRepository;
 use flight\net\Request;
 use PDO;

@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Response;
-
-use App\Response\AppResponse;
+namespace App\Http\Response;
 
 abstract class MoneyFlowResponse extends AppResponse
 {

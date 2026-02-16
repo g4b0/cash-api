@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Controller;
+namespace App\Http\Controller;
 
-use App\Dto\ExpenseDto;
 use App\Exception\AppException;
+use App\Http\Dto\ExpenseDto;
+use App\Http\Response\Crud\CreatedResourceResponse;
+use App\Http\Response\Crud\NoContentResponse;
+use App\Http\Response\ExpenseResponse;
 use App\Repository\ExpenseRepository;
 use App\Repository\MemberRepository;
-use App\Response\CreatedResourceResponse;
-use App\Response\ExpenseResponse;
-use App\Response\NoContentResponse;
 use flight\Engine;
 
 class ExpenseController extends Controller

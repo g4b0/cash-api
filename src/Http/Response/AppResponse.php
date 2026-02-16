@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Response;
+namespace App\Http\Response;
 
+use DateTime;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
-use DateTime;
 
 /**
  * Abstract base class for all API responses.

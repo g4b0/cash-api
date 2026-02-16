@@ -46,7 +46,7 @@ Flight PHP is a micro framework with route-based architecture. Key conventions:
 
 The codebase follows a three-layer architecture for separation of concerns:
 
-**Controllers** (`src/Controller/`)
+**Controllers** (`src/Http/Controller/`)
 - Handle HTTP concerns: request parsing, response formatting, status codes
 - Validate authorization (JWT, ownership checks, community membership)
 - Delegate business logic to services
@@ -199,7 +199,7 @@ Input validation for POST/PUT endpoints uses Data Transfer Objects (DTOs).
 
 This provides consistency across the entire stack - from database to API to client code.
 
-**Location**: `src/Dto/`
+**Location**: `src/Http/Dto/`
 
 **Naming**: `{Entity}Dto` (e.g., `IncomeDto`, `ExpenseDto`)
 
@@ -280,7 +280,7 @@ $this->incomeRepository->update($id, $dto, $contributionPercentage);
 
 Output formatting uses Response classes for type safety and consistency.
 
-**Location**: `src/Response/`
+**Location**: `src/Http/Response/` (`src/Http/Response/Crud/` for `CreatedResourceResponse` and `NoContentResponse`)
 
 **Naming**: `{Entity}Response` (e.g., `IncomeResponse`, `ExpenseResponse`, `CreatedResourceResponse`)
 

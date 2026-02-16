@@ -338,12 +338,14 @@ cash/
 │   └── cash.db            # SQLite database (created after init)
 ├── src/
 │   ├── Command/           # CLI command classes
-│   ├── Controller/        # HTTP controllers (Auth, Income, Expense, Transactions)
-│   ├── Dto/               # Data Transfer Objects for input validation
 │   ├── Exception/         # Custom exceptions (AppException)
-│   ├── Middleware/        # JWT auth & exception handling
+│   ├── Http/
+│   │   ├── Controller/    # HTTP controllers (Auth, Income, Expense, Transactions)
+│   │   ├── Dto/           # Data Transfer Objects for input validation
+│   │   ├── Middleware/    # JWT auth & exception handling
+│   │   └── Response/      # Type-safe response objects
+│   │       └── Crud/      # Generic CRUD responses (Created, NoContent)
 │   ├── Repository/        # Database queries (Income, Expense, Member, Transaction)
-│   ├── Response/          # Type-safe response objects (Income, Expense, Token, Paginated, etc.)
 │   ├── Service/           # Business logic (JWT, balance calc)
 │   ├── Validation/        # Input validators (shared Validator class)
 │   └── routes.php         # Route definitions
@@ -386,7 +388,7 @@ The codebase follows a clean three-layer separation of concerns:
 
 **Controllers** → **Services** → **Repositories** → **Database**
 
-- **Controllers** (`src/Controller/`): Handle HTTP concerns (routing, validation, JSON responses)
+- **Controllers** (`src/Http/Controller/`): Handle HTTP concerns (routing, validation, JSON responses)
 - **Services** (`src/Service/`): Contain business logic (e.g., `BalanceCalculator`)
 - **Repositories** (`src/Repository/`): Execute all database queries (one method per query)
 

@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Dto;
 
-use App\Dto\ExpenseDto;
 use App\Exception\AppException;
+use App\Http\Dto\ExpenseDto;
 use flight\net\Request;
 use PHPUnit\Framework\TestCase;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Http\Controller;
 
-use App\Response\AppResponse;
+use App\Http\Response\AppResponse;
 use flight\Engine;
 use PDO;
 

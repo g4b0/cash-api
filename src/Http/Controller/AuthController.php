@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controller;
+namespace App\Http\Controller;
 
 use App\Exception\AppException;
+use App\Http\Response\TokenPairResponse;
 use App\Repository\MemberRepository;
-use App\Response\TokenPairResponse;
 use App\Service\JwtService;
 use flight\Engine;
 

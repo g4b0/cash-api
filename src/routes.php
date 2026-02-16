@@ -1,11 +1,11 @@
 <?php
 
-use App\Controller\AuthController;
-use App\Controller\ExpenseController;
-use App\Controller\IncomeController;
-use App\Controller\TransactionsController;
-use App\Middleware\ExceptionHandler;
-use App\Middleware\JwtAuthMiddleware;
+use App\Http\Controller\AuthController;
+use App\Http\Controller\ExpenseController;
+use App\Http\Controller\IncomeController;
+use App\Http\Controller\TransactionsController;
+use App\Http\Middleware\ExceptionHandler;
+use App\Http\Middleware\JwtAuthMiddleware;
 use flight\Engine;
 
 function registerRoutes(Engine $app): void

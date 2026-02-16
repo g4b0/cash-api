@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Dto;
+namespace App\Http\Dto;
 
 use flight\net\Request;
 

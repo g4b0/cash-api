@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Response;
+namespace App\Http\Response\Crud;
+
+use App\Http\Response\AppResponse;
 
 /**
  * Response for DELETE endpoints that successfully delete a resource.

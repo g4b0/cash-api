@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Dto\ExpenseDto;
+use App\Http\Dto\ExpenseDto;
 use PDO;
 
 class ExpenseRepository extends Repository

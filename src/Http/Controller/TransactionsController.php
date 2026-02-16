@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Controller;
+namespace App\Http\Controller;
 
 use App\Exception\AppException;
+use App\Http\Response\BalanceResponse;
+use App\Http\Response\ExpenseResponse;
+use App\Http\Response\IncomeResponse;
+use App\Http\Response\TransactionListResponse;
 use App\Repository\MemberRepository;
 use App\Repository\TransactionRepository;
-use App\Response\TransactionListResponse;
-use App\Response\IncomeResponse;
-use App\Response\ExpenseResponse;
-use App\Response\BalanceResponse;
 use App\Service\BalanceCalculator;
 use App\Validation\Validator;
 use flight\Engine;

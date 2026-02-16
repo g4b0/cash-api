@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Response;
+namespace App\Http\Response\Crud;
+
+use App\Http\Response\AppResponse;
 
 /**
  * Response for POST endpoints that create a new resource.

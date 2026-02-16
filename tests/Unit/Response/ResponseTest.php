@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Response;
 
-use App\Response\BalanceResponse;
-use App\Response\CreatedResourceResponse;
-use App\Response\NoContentResponse;
-use App\Response\TokenPairResponse;
+use App\Http\Response\BalanceResponse;
+use App\Http\Response\Crud\CreatedResourceResponse;
+use App\Http\Response\Crud\NoContentResponse;
+use App\Http\Response\TokenPairResponse;
 use PHPUnit\Framework\TestCase;
 
 class ResponseTest extends TestCase
