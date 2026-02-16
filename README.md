@@ -288,10 +288,10 @@ php7.4 ./vendor/bin/phpunit tests/Unit/
 
 ## Code Coverage
 
-**Prerequisites**: Install Xdebug or PCOV for code coverage:
+**Prerequisites**: Install Xdebug for code coverage:
 
 ```bash
-# Install Xdebug (recommended for PHP 7.4)
+# Install Xdebug for PHP 7.4
 sudo apt-get install php7.4-xdebug
 
 # Verify installation
@@ -301,7 +301,7 @@ php7.4 -m | grep xdebug
 Generate coverage reports locally:
 
 ```bash
-# Generate HTML and Clover reports
+# Generate HTML and Clover reports (XDEBUG_MODE=coverage is set automatically)
 php7.4 /usr/local/bin/composer test:coverage
 
 # View HTML coverage report in browser
@@ -309,6 +309,13 @@ open tests/coverage/html/index.html
 
 # Quick text summary in terminal
 php7.4 /usr/local/bin/composer test:coverage:text
+```
+
+**Alternative**: Run PHPUnit directly with Xdebug mode:
+
+```bash
+# Set XDEBUG_MODE and run PHPUnit manually
+XDEBUG_MODE=coverage php7.4 vendor/bin/phpunit --coverage-html tests/coverage/html --coverage-clover tests/coverage/clover.xml
 ```
 
 **Coverage Reports:**

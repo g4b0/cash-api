@@ -25,7 +25,7 @@
     },
     "scripts": {
         "test": "php7.4 vendor/bin/phpunit",
-        "test:coverage": "php7.4 vendor/bin/phpunit --coverage-html tests/coverage/html --coverage-clover tests/coverage/clover.xml",
-        "test:coverage:text": "php7.4 vendor/bin/phpunit --coverage-text"
+        "test:coverage": "XDEBUG_MODE=coverage php7.4 vendor/bin/phpunit --coverage-html tests/coverage/html --coverage-clover tests/coverage/clover.xml",
+        "test:coverage:text": "XDEBUG_MODE=coverage php7.4 vendor/bin/phpunit --coverage-text"
     }
 }
