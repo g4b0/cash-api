@@ -10,7 +10,7 @@ abstract class MoneyFlowResponse extends AppResponse
     public int $memberId;
     public \DateTime $date;
     public string $reason;
-    public string $amount; // stored as string for JSON precision
+    public float $amount;
     public \DateTime $createdAt;
     public \DateTime $updatedAt;
 
@@ -20,7 +20,7 @@ abstract class MoneyFlowResponse extends AppResponse
         $this->memberId = (int) $data['memberId'];
         $this->date = new \DateTime($data['date']);
         $this->reason = $data['reason'];
-        $this->amount = (string) $data['amount'];
+        $this->amount = (float) $data['amount'];
         $this->createdAt = new \DateTime($data['createdAt']);
         $this->updatedAt = new \DateTime($data['updatedAt']);
     }

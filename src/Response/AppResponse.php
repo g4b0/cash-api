@@ -57,8 +57,18 @@ abstract class AppResponse implements JsonSerializable
      */
     private function convertValue($value)
     {
-        // Null or scalar types - return as-is
-        if ($value === null || is_scalar($value)) {
+        // Null - return as-is
+        if ($value === null) {
+            return $value;
+        }
+
+        // Float - round to 2 decimal places for currency/monetary values
+        if (is_float($value)) {
+            return round($value, 2);
+        }
+
+        // Other scalar types - return as-is
+        if (is_scalar($value)) {
             return $value;
         }
 

@@ -243,8 +243,9 @@ paths:
                           type: string
                           example: "Salary"
                         amount:
-                          type: string
-                          example: "1000.50"
+                          type: number
+                          format: float
+                          example: 1000.50
                         contributionPercentage:
                           type: integer
                           nullable: true
@@ -793,9 +794,10 @@ components:
           type: string
           example: Monthly salary
         amount:
-          type: string
-          description: Amount as decimal string
-          example: '1000.50'
+          type: number
+          format: float
+          description: Amount rounded to 2 decimal places
+          example: 1000.50
         contributionPercentage:
           type: integer
           description: Percentage contributed to common account
@@ -827,9 +829,10 @@ components:
           type: string
           example: Groceries
         amount:
-          type: string
-          description: Amount as decimal string
-          example: '500.75'
+          type: number
+          format: float
+          description: Amount rounded to 2 decimal places
+          example: 500.75
         createdAt:
           type: string
           format: date-time

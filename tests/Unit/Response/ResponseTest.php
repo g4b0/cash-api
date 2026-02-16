@@ -66,19 +66,19 @@ class ResponseTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals([
             'memberId' => 1,
-            'balance' => '1250.5',
+            'balance' => 1250.50,
         ], $response->toArray());
         $this->assertNull($response->getLocationHeader());
     }
 
-    public function testBalanceResponsePreservesDecimalPrecision(): void
+    public function testBalanceResponseRoundsToTwoDecimals(): void
     {
-        // Float with many decimals - string preserves precision
+        // Float with many decimals - rounded to 2 decimal places
         $response = new BalanceResponse(2, 625.123456789);
 
         $array = $response->toArray();
-        $this->assertIsString($array['balance']);
-        $this->assertEquals('625.123456789', $array['balance']);
+        $this->assertIsFloat($array['balance']);
+        $this->assertEquals(625.12, $array['balance']); // Rounded to 2 decimals
     }
 
     public function testJsonSerializableInterfaceWorks(): void

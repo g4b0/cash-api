@@ -298,10 +298,10 @@ Output formatting uses Response classes for type safety and consistency.
 abstract class MoneyFlowResponse extends AppResponse
 {
     public int $id;
-    public int $ownerId;              // camelCase property
+    public int $memberId;              // camelCase property
     public \DateTime $date;
     public string $reason;
-    public string $amount;             // stored as string for JSON precision
+    public float $amount;              // Rounded to 2 decimals by AppResponse
     public \DateTime $createdAt;      // camelCase property
     public \DateTime $updatedAt;      // camelCase property
 
@@ -366,7 +366,7 @@ $this->json(new ExpenseResponse($expense));
 ```
 
 **Benefits**:
-- Type-safe property access with camelCase naming (`$response->ownerId`)
+- Type-safe property access with camelCase naming (`$response->memberId`)
 - DateTime objects for proper date handling (not raw strings)
 - Automatic serialization via reflection (no manual toArray() needed)
 - Composable: responses can contain other Response objects
@@ -378,12 +378,18 @@ $this->json(new ExpenseResponse($expense));
 - `CreatedResourceResponse` - POST endpoints (201 + Location header + resource ID)
 - `NoContentResponse` - DELETE endpoints (204 + empty body)
 - `TokenPairResponse` - Auth endpoints (200 + access/refresh tokens)
-- `BalanceResponse` - Balance endpoint (200 + memberId + balance as string for precision)
+- `BalanceResponse` - Balance endpoint (200 + memberId + balance rounded to 2 decimals)
 - `TransactionListResponse` - Transactions list (200 + transactions array + pagination)
 - `Pagination` - Pagination metadata (composable, used by TransactionListResponse)
 - `MoneyFlowResponse` - Abstract base for income/expense responses
 - `IncomeResponse` - GET/PUT `/income/@id` endpoints (extends MoneyFlowResponse, adds type and contributionPercentage)
 - `ExpenseResponse` - GET/PUT `/expense/@id` endpoints (extends MoneyFlowResponse, adds type field)
+
+**Monetary Values**:
+- All monetary amounts (`amount`, `balance`) are stored and returned as `float` type
+- `AppResponse` automatically rounds floats to **2 decimal places** during JSON serialization
+- Rounding prevents floating-point precision issues in JSON responses (e.g., 625.9999999 → 625.99)
+- **Future improvement**: Will migrate to `moneyphp/money` library for proper currency handling
 
 **Note**: Response classes have unit tests in `tests/Unit/Response/ResponseTest.php` and are also tested indirectly via Feature tests (testing actual HTTP responses).
 
