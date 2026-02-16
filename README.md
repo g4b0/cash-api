@@ -288,6 +288,16 @@ php7.4 ./vendor/bin/phpunit tests/Unit/
 
 ## Code Coverage
 
+**Prerequisites**: Install Xdebug or PCOV for code coverage:
+
+```bash
+# Install Xdebug (recommended for PHP 7.4)
+sudo apt-get install php7.4-xdebug
+
+# Verify installation
+php7.4 -m | grep xdebug
+```
+
 Generate coverage reports locally:
 
 ```bash
@@ -306,7 +316,7 @@ php7.4 /usr/local/bin/composer test:coverage:text
 - **Clover XML**: `tests/coverage/clover.xml` - Machine-readable format for CI/CD
 - **Text Output**: Terminal summary of coverage percentages
 
-**GitHub Integration**: When published, coverage is automatically tracked via Codecov.io. Coverage badges and PR comments show coverage trends.
+**GitHub Integration**: When published, coverage is automatically tracked via Codecov.io. Coverage badges and PR comments show coverage trends (Xdebug installed automatically in CI).
 
 ## Project Structure
 

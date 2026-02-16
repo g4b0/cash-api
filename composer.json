@@ -24,8 +24,8 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
-        "test:coverage": "phpunit --coverage-html tests/coverage/html --coverage-clover tests/coverage/clover.xml",
-        "test:coverage:text": "phpunit --coverage-text"
+        "test": "php7.4 vendor/bin/phpunit",
+        "test:coverage": "php7.4 vendor/bin/phpunit --coverage-html tests/coverage/html --coverage-clover tests/coverage/clover.xml",
+        "test:coverage:text": "php7.4 vendor/bin/phpunit --coverage-text"
     }
 }
