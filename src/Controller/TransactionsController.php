@@ -33,18 +33,18 @@ class TransactionsController extends Controller
         ?string $num = null,
         ?string $page = null
     ): void {
-        // Get authenticated user
+        // Get authenticated user (JWT is signed and trusted - cid is guaranteed valid)
         $authUser = $this->getAuthUser();
         $authCommunityId = (int) $authUser->cid;
 
-        // Verify requested member exists and belongs to a community
+        // Verify target member exists and get their community (needed for authorization)
         $memberCommunityId = $this->memberRepository->getCommunityId((int) $memberId);
 
         if ($memberCommunityId === null) {
             throw AppException::MEMBER_NOT_FOUND();
         }
 
-        // Verify auth user is from the same community as requested member
+        // Verify target member is in same community as authenticated user
         if ($memberCommunityId !== $authCommunityId) {
             throw AppException::FORBIDDEN();
         }
@@ -90,18 +90,18 @@ class TransactionsController extends Controller
 
     public function balance(string $communityId, string $memberId): void
     {
-        // Get authenticated user
+        // Get authenticated user (JWT is signed and trusted - cid is guaranteed valid)
         $authUser = $this->getAuthUser();
         $authCommunityId = (int) $authUser->cid;
 
-        // Verify requested member exists and belongs to a community
+        // Verify target member exists and get their community (needed for authorization)
         $memberCommunityId = $this->memberRepository->getCommunityId((int) $memberId);
 
         if ($memberCommunityId === null) {
             throw AppException::MEMBER_NOT_FOUND();
         }
 
-        // Verify auth user is from the same community as requested member
+        // Verify target member is in same community as authenticated user
         if ($memberCommunityId !== $authCommunityId) {
             throw AppException::FORBIDDEN();
         }
