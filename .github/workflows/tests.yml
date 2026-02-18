@@ -23,7 +23,7 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Initialize database
-        run: php database/init_db.php
+        run: php src/Database/init_db.php
 
       - name: Run tests with coverage
         run: vendor/bin/phpunit --coverage-clover tests/coverage/clover.xml
