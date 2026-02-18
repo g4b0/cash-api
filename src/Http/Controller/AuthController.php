@@ -2,9 +2,9 @@
 
 namespace App\Http\Controller;
 
+use App\Database\Repository\MemberRepository;
 use App\Exception\AppException;
 use App\Http\Response\TokenPairResponse;
-use App\Repository\MemberRepository;
 use App\Service\JwtService;
 use flight\Engine;
 

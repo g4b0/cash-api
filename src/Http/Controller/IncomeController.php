@@ -2,13 +2,13 @@
 
 namespace App\Http\Controller;
 
+use App\Database\Repository\IncomeRepository;
+use App\Database\Repository\MemberRepository;
 use App\Exception\AppException;
 use App\Http\Dto\IncomeDto;
 use App\Http\Response\Crud\CreatedResourceResponse;
 use App\Http\Response\Crud\NoContentResponse;
 use App\Http\Response\IncomeResponse;
-use App\Repository\IncomeRepository;
-use App\Repository\MemberRepository;
 use flight\Engine;
 
 class IncomeController extends Controller

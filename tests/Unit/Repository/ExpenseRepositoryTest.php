@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Repository;
 
+use App\Database\Repository\ExpenseRepository;
 use App\Http\Dto\ExpenseDto;
-use App\Repository\ExpenseRepository;
 use flight\net\Request;
 use PDO;
 use PHPUnit\Framework\TestCase;

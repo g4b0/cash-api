@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-$dbPath = __DIR__ . '/cash.db';
+$dbPath = __DIR__ . '/../../database/cash.db';
+
 $schemaPath = __DIR__ . '/schema.sql';
 
 if (file_exists($dbPath)) {

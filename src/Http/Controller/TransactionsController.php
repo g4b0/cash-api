@@ -2,13 +2,13 @@
 
 namespace App\Http\Controller;
 
+use App\Database\Repository\MemberRepository;
+use App\Database\Repository\TransactionRepository;
 use App\Exception\AppException;
 use App\Http\Response\BalanceResponse;
 use App\Http\Response\ExpenseResponse;
 use App\Http\Response\IncomeResponse;
 use App\Http\Response\TransactionListResponse;
-use App\Repository\MemberRepository;
-use App\Repository\TransactionRepository;
 use App\Service\BalanceCalculator;
 use App\Validation\Validator;
 use flight\Engine;

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controller;
 
+use App\Database\Repository\ExpenseRepository;
+use App\Database\Repository\MemberRepository;
 use App\Exception\AppException;
 use App\Http\Dto\ExpenseDto;
 use App\Http\Response\Crud\CreatedResourceResponse;
 use App\Http\Response\Crud\NoContentResponse;
 use App\Http\Response\ExpenseResponse;
-use App\Repository\ExpenseRepository;
-use App\Repository\MemberRepository;
 use flight\Engine;
 
 class ExpenseController extends Controller

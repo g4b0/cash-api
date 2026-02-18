@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use App\Repository\ExpenseRepository;
-use App\Repository\IncomeRepository;
+use App\Database\Repository\ExpenseRepository;
+use App\Database\Repository\IncomeRepository;
 use PDO;
 
 class BalanceCalculator

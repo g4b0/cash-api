@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Repository;
 
-use App\Repository\MemberRepository;
+use App\Database\Repository\MemberRepository;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Tests\Support\DatabaseSeeder;

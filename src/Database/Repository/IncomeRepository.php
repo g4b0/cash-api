@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Database\Repository;
 
 use App\Http\Dto\IncomeDto;
 use PDO;

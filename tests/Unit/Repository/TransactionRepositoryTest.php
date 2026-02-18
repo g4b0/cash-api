@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Repository;
 
-use App\Repository\TransactionRepository;
+use App\Database\Repository\TransactionRepository;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Tests\Support\DatabaseSeeder;

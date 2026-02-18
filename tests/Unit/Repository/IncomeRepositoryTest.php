@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Repository;
 
+use App\Database\Repository\IncomeRepository;
 use App\Http\Dto\IncomeDto;
-use App\Repository\IncomeRepository;
 use flight\net\Request;
 use PDO;
 use PHPUnit\Framework\TestCase;
