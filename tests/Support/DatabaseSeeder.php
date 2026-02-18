@@ -11,7 +11,7 @@ class DatabaseSeeder
         $pdo = new PDO('sqlite::memory:');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $schema = file_get_contents(__DIR__ . '/../../database/schema.sql');
+        $schema = file_get_contents(__DIR__ . '/../../src/Database/schema.sql');
         $pdo->exec($schema);
 
         return $pdo;
