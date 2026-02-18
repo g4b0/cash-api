@@ -5,5 +5,4 @@
 database/cash.db
 /.phpunit.result.cache
 
-# Code coverage reports
 /tests/coverage/
