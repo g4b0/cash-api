@@ -1,6 +1,6 @@
 {
     "require": {
-        "php": ">=7.4",
+        "php": "8.3.*",
         "flightphp/core": "^3.18",
         "ext-sqlite3": "*",
         "ext-pdo": "*",
@@ -26,8 +26,8 @@
         }
     },
     "scripts": {
-        "test": "php7.4 vendor/bin/phpunit",
-        "test:coverage": "XDEBUG_MODE=coverage php7.4 vendor/bin/phpunit --coverage-html tests/coverage/html --coverage-clover tests/coverage/clover.xml",
-        "test:coverage:text": "XDEBUG_MODE=coverage php7.4 vendor/bin/phpunit --coverage-text"
+        "test": "php8.3 vendor/bin/phpunit",
+        "test:coverage": "XDEBUG_MODE=coverage php8.3 vendor/bin/phpunit --coverage-html tests/coverage/html --coverage-clover tests/coverage/clover.xml",
+        "test:coverage:text": "XDEBUG_MODE=coverage php8.3 vendor/bin/phpunit --coverage-text"
     }
 }
