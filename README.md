@@ -4,8 +4,8 @@ A backend REST API for managing shared finances in small communities (e.g., fami
 
 **🤖 A great part of this codebase was written by AI. Few lines of code were written by humans.**
 
-[![Tests](https://github.com/USERNAME/cash/actions/workflows/tests.yml/badge.svg)](https://github.com/USERNAME/cash/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/USERNAME/cash/branch/master/graph/badge.svg)](https://codecov.io/gh/USERNAME/cash)
+[![Tests](https://github.com/g4b0/cash-api/actions/workflows/tests.yml/badge.svg)](https://github.com/g4b0/cash-api/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/g4b0/cash-api/branch/master/graph/badge.svg)](https://codecov.io/gh/g4b0/cash-api)
 
 ## Features
 
